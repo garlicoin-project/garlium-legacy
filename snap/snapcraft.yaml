@@ -1,6 +1,6 @@
-name: electrum-ltc
+name: garlium
 version: master
-summary: Litecoin thin client
+summary: Garlicoin thin client
 description: |
   Lightweight Litecoin client
 
@@ -8,16 +8,16 @@ grade: devel # must be 'stable' to release into candidate/stable channels
 confinement: strict
 
 apps:
-  electrum-ltc:
-    command: desktop-launch electrum-ltc
+  garlium:
+    command: desktop-launch garlium
     plugs: [network, network-bind, x11, unity7]
 
 parts:
-  electrum-ltc:
+  garlium:
     source: .
     plugin: python
     python-version: python3
     stage-packages: [python3-pyqt5]
     build-packages: [pyqt5-dev-tools]
-    install: pyrcc5 icons.qrc -o $SNAPCRAFT_PART_INSTALL/lib/python3.5/site-packages/electrum_ltc_gui/qt/icons_rc.py
+    install: pyrcc5 icons.qrc -o $SNAPCRAFT_PART_INSTALL/lib/python3.5/site-packages/garlium_ltc_gui/qt/icons_rc.py
     after: [desktop-qt5]

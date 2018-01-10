@@ -10,7 +10,7 @@ for i, x in enumerate(sys.argv):
 else:
     raise BaseException('no version')
 
-home = '/Users/pooler/electrum-ltc/'
+home = '/Users/pooler/garlium/'
 block_cipher=None
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
@@ -35,7 +35,7 @@ datas += collect_data_files('btchip')
 datas += collect_data_files('keepkeylib')
 
 # We don't put these files in to actually include them in the script but to make the Analysis method scan them for imports
-a = Analysis([home+'electrum-ltc',
+a = Analysis([home+'garlium',
               home+'gui/qt/main_window.py',
               home+'gui/text.py',
               home+'lib/util.py',
@@ -67,7 +67,7 @@ exe = EXE(pyz,
           a.scripts,
           a.binaries,
           a.datas,
-          name='Electrum-LTC',
+          name='Garlium',
           debug=False,
           strip=False,
           upx=True,
@@ -76,7 +76,7 @@ exe = EXE(pyz,
 
 app = BUNDLE(exe,
              version = VERSION,
-             name='Electrum-LTC.app',
+             name='Garlium.app',
              icon=home+'electrum.icns',
              bundle_identifier=None,
              info_plist = {

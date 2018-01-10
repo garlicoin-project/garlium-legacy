@@ -23,7 +23,7 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_parse_URI_address(self):
-        self._do_test_parse_URI('litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv',
+        self._do_test_parse_URI('garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv',
                                 {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv'})
 
     def test_parse_URI_only_address(self):
@@ -32,39 +32,39 @@ class TestUtil(unittest.TestCase):
 
 
     def test_parse_URI_address_label(self):
-        self._do_test_parse_URI('litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?label=electrum%20test',
-                                {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'label': 'electrum test'})
+        self._do_test_parse_URI('garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?label=garlium%20test',
+                                {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'label': 'garlium test'})
 
     def test_parse_URI_address_message(self):
-        self._do_test_parse_URI('litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?message=electrum%20test',
-                                {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'message': 'electrum test', 'memo': 'electrum test'})
+        self._do_test_parse_URI('garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?message=garlium%20test',
+                                {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'message': 'garlium test', 'memo': 'garlium test'})
 
     def test_parse_URI_address_amount(self):
-        self._do_test_parse_URI('litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?amount=0.0003',
+        self._do_test_parse_URI('garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?amount=0.0003',
                                 {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'amount': 30000})
 
     def test_parse_URI_address_request_url(self):
-        self._do_test_parse_URI('litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?r=http://domain.tld/page?h%3D2a8628fc2fbe',
+        self._do_test_parse_URI('garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?r=http://domain.tld/page?h%3D2a8628fc2fbe',
                                 {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'r': 'http://domain.tld/page?h=2a8628fc2fbe'})
 
     def test_parse_URI_ignore_args(self):
-        self._do_test_parse_URI('litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?test=test',
+        self._do_test_parse_URI('garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?test=test',
                                 {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'test': 'test'})
 
     def test_parse_URI_multiple_args(self):
-        self._do_test_parse_URI('litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?amount=0.00004&label=electrum-test&message=electrum%20test&test=none&r=http://domain.tld/page',
-                                {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'amount': 4000, 'label': 'electrum-test', 'message': u'electrum test', 'memo': u'electrum test', 'r': 'http://domain.tld/page', 'test': 'none'})
+        self._do_test_parse_URI('garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?amount=0.00004&label=garlium-test&message=garlium%20test&test=none&r=http://domain.tld/page',
+                                {'address': 'LectrumELqJWMECz7W2iarBpT4VvAPqwAv', 'amount': 4000, 'label': 'garlium-test', 'message': u'garlium test', 'memo': u'garlium test', 'r': 'http://domain.tld/page', 'test': 'none'})
 
     def test_parse_URI_no_address_request_url(self):
-        self._do_test_parse_URI('litecoin:?r=http://domain.tld/page?h%3D2a8628fc2fbe',
+        self._do_test_parse_URI('garlicoin:?r=http://domain.tld/page?h%3D2a8628fc2fbe',
                                 {'r': 'http://domain.tld/page?h=2a8628fc2fbe'})
 
     def test_parse_URI_invalid_address(self):
-        self.assertRaises(BaseException, parse_URI, 'litecoin:invalidaddress')
+        self.assertRaises(BaseException, parse_URI, 'garlicoin:invalidaddress')
 
     def test_parse_URI_invalid(self):
-        self.assertRaises(BaseException, parse_URI, 'notlitecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv')
+        self.assertRaises(BaseException, parse_URI, 'notgarlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv')
 
     def test_parse_URI_parameter_polution(self):
-        self.assertRaises(Exception, parse_URI, 'litecoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?amount=0.0003&label=test&amount=30.0')
+        self.assertRaises(Exception, parse_URI, 'garlicoin:LectrumELqJWMECz7W2iarBpT4VvAPqwAv?amount=0.0003&label=test&amount=30.0')
 

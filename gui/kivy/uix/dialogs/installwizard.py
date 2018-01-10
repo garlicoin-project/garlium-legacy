@@ -28,7 +28,7 @@ test_xpub = "xpub661MyMwAqRbcEbvVtRRSjqxVnaWVUMewVzMiURAKyYratih4TtBpMypzzefmv8z
 
 Builder.load_string('''
 #:import Window kivy.core.window.Window
-#:import _ electrum_ltc_gui.kivy.i18n._
+#:import _ garlium_ltc_gui.kivy.i18n._
 
 
 <WizardTextInput@TextInput>
@@ -73,7 +73,7 @@ Builder.load_string('''
             size: Window.size
 
     crcontent: crcontent
-    # add electrum icon
+    # add garlium icon
     BoxLayout:
         orientation: 'vertical' if self.width < self.height else 'horizontal'
         padding:
@@ -88,7 +88,7 @@ Builder.load_string('''
             height: self.minimum_height
             Label:
                 color: root.text_color
-                text: 'ELECTRUM'
+                text: 'GARLIUM'
                 size_hint: 1, None
                 height: self.texture_size[1] if self.opacity else 0
                 font_size: '33sp'

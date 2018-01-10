@@ -48,14 +48,14 @@ util = False
 
 # register widget cache for keeping memory down timeout to forever to cache
 # the data
-Cache.register('electrum_ltc_widgets', timeout=0)
+Cache.register('garlium_ltc_widgets', timeout=0)
 
 from kivy.uix.screenmanager import Screen
 from kivy.uix.tabbedpanel import TabbedPanel
 from kivy.uix.label import Label
 from kivy.core.clipboard import Clipboard
 
-Factory.register('TabbedCarousel', module='electrum_ltc_gui.kivy.uix.screens')
+Factory.register('TabbedCarousel', module='garlium_ltc_gui.kivy.uix.screens')
 
 # Register fonts without this you won't be able to use bold/italic...
 # inside markup.
@@ -132,7 +132,7 @@ class ElectrumWindow(App):
         self.send_screen.set_URI(uri)
 
     def on_new_intent(self, intent):
-        if intent.getScheme() != 'litecoin':
+        if intent.getScheme() != 'garlicoin':
             return
         uri = intent.getDataString()
         self.set_URI(uri)
@@ -241,7 +241,7 @@ class ElectrumWindow(App):
 
         App.__init__(self)#, **kwargs)
 
-        title = _('Electrum-LTC App')
+        title = _('Garlium App')
         self.electrum_config = config = kwargs.get('config', None)
         self.language = config.get('language', 'en')
         self.network = network = kwargs.get('network', None)
@@ -300,7 +300,7 @@ class ElectrumWindow(App):
         if is_address(data):
             self.set_URI(data)
             return
-        if data.startswith('litecoin:'):
+        if data.startswith('garlicoin:'):
             self.set_URI(data)
             return
         # try to decode transaction
@@ -387,7 +387,7 @@ class ElectrumWindow(App):
         from jnius import autoclass, cast
         from android import activity
         PythonActivity = autoclass('org.kivy.android.PythonActivity')
-        SimpleScannerActivity = autoclass("org.electrum.qr.SimpleScannerActivity")
+        SimpleScannerActivity = autoclass("org.garlium.qr.SimpleScannerActivity")
         Intent = autoclass('android.content.Intent')
         intent = Intent(PythonActivity.mActivity, SimpleScannerActivity)
 
@@ -488,7 +488,7 @@ class ElectrumWindow(App):
                 self.load_wallet(wallet)
                 self.on_resume()
         else:
-            Logger.debug('Electrum: Wallet not found. Launching install wizard')
+            Logger.debug('Garlium: Wallet not found. Launching install wizard')
             storage = WalletStorage(path)
             wizard = Factory.InstallWizard(self.electrum_config, storage)
             wizard.bind(on_wizard_complete=self.on_wizard_complete)
@@ -552,7 +552,7 @@ class ElectrumWindow(App):
 
     @profiler
     def init_ui(self):
-        ''' Initialize The Ux part of electrum. This function performs the basic
+        ''' Initialize The Ux part of garlium. This function performs the basic
         tasks of setting up the ui.
         '''
         #from weakref import ref
@@ -563,9 +563,9 @@ class ElectrumWindow(App):
 
         #setup lazy imports for mainscreen
         Factory.register('AnimatedPopup',
-                         module='electrum_ltc_gui.kivy.uix.dialogs')
+                         module='garlium_ltc_gui.kivy.uix.dialogs')
         Factory.register('QRCodeWidget',
-                         module='electrum_ltc_gui.kivy.uix.qrcodewidget')
+                         module='garlium_ltc_gui.kivy.uix.qrcodewidget')
 
         # preload widgets. Remove this if you want to load the widgets on demand
         #Cache.append('electrum_ltc_widgets', 'AnimatedPopup', Factory.AnimatedPopup())
@@ -670,8 +670,8 @@ class ElectrumWindow(App):
                 from plyer import notification
             icon = (os.path.dirname(os.path.realpath(__file__))
                     + '/../../' + self.icon)
-            notification.notify('Electrum-LTC', message,
-                            app_icon=icon, app_name='Electrum-LTC')
+            notification.notify('Garlium', message,
+                            app_icon=icon, app_name='Garlium')
         except ImportError:
             Logger.Error('Notification: needs plyer; `sudo pip install plyer`')
 

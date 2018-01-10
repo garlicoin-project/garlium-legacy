@@ -46,7 +46,7 @@ from kivy.logger import Logger
 class ElectrumGui:
 
     def __init__(self, config, daemon, plugins):
-        Logger.debug('ElectrumGUI: initialising')
+        Logger.debug('GarliumGUI: initialising')
         self.daemon = daemon
         self.network = daemon.network
         self.config = config

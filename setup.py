@@ -69,7 +69,7 @@ setup(
         'electrum_ltc_plugins': 'plugins',
     },
     package_data={
-        'electrum_ltc': [
+        'garlium_ltc': [
             'servers.json',
             'servers_testnet.json',
             'currencies.json',
@@ -77,15 +77,15 @@ setup(
             'checkpoints_testnet.json',
             'www/index.html',
             'wordlist/*.txt',
-            'locale/*/LC_MESSAGES/electrum.mo',
+            'locale/*/LC_MESSAGES/garlium.mo',
         ]
     },
     scripts=['garlium'],
     data_files=data_files,
     description="Lightweight Garlium Wallet",
     author="Thomas Voegtlin",
-    author_email="thomasv@electrum.org",
+    author_email="thomasv@garlium.org",
     license="MIT Licence",
-    url="http://electrum-ltc.org",
+    url="http://github.com/xSke/garlium",
     long_description="""Lightweight Garlicoin Wallet"""
 )

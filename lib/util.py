@@ -233,7 +233,7 @@ def android_data_dir():
     return PythonActivity.mActivity.getFilesDir().getPath() + '/data'
 
 def android_headers_dir():
-    d = android_ext_dir() + '/org.electrum_ltc.electrum_ltc'
+    d = android_ext_dir() + '/org.garlium_ltc.garlium_ltc'
     if not os.path.exists(d):
         os.mkdir(d)
     return d
@@ -427,7 +427,7 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'explorer.litecoin.net': ('http://explorer.litecoin.net',
+    'explorer.garlicoin.net': ('http://explorer.garlicoin.net',
                         {'tx': 'tx', 'addr': 'address'}),
     'Blockr.io': ('https://ltc.blockr.io',
                         {'tx': 'tx/info', 'addr': 'address/info'}),
@@ -476,12 +476,12 @@ def parse_URI(uri, on_pr=None):
 
     if ':' not in uri:
         if not bitcoin.is_address(uri):
-            raise BaseException("Not a litecoin address")
+            raise BaseException("Not a garlicoin address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
-    if u.scheme != 'litecoin':
-        raise BaseException("Not a litecoin URI")
+    if u.scheme != 'garlicoin':
+        raise BaseException("Not a garlicoin URI")
     address = u.path
 
     # python for android fails to parse query
@@ -498,7 +498,7 @@ def parse_URI(uri, on_pr=None):
     out = {k: v[0] for k, v in pq.items()}
     if address:
         if not bitcoin.is_address(address):
-            raise BaseException("Invalid litecoin address:" + address)
+            raise BaseException("Invalid garlicoin address:" + address)
         out['address'] = address
     if 'amount' in out:
         am = out['amount']
@@ -548,7 +548,7 @@ def create_URI(addr, amount, message):
         query.append('amount=%s'%format_satoshis_plain(amount))
     if message:
         query.append('message=%s'%urllib.parse.quote(message))
-    p = urllib.parse.ParseResult(scheme='litecoin', netloc='', path=addr, params='', query='&'.join(query), fragment='')
+    p = urllib.parse.ParseResult(scheme='garlicoin', netloc='', path=addr, params='', query='&'.join(query), fragment='')
     return urllib.parse.urlunparse(p)
 
 

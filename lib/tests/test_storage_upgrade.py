@@ -260,7 +260,7 @@ class TestStorageUpgrade(WalletTestCase):
         from lib.simple_config import SimpleConfig
 
         cls.electrum_path = tempfile.mkdtemp()
-        config = SimpleConfig({'electrum_path': cls.electrum_path})
+        config = SimpleConfig({'garlium_path': cls.electrum_path})
 
         gui_name = 'cmdline'
         # TODO it's probably wasteful to load all plugins... only need Trezor

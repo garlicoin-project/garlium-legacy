@@ -32,12 +32,12 @@ class ExchangeBase(PrintError):
     def get_json(self, site, get_string):
         # APIs must have https
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum'})
+        response = requests.request('GET', url, headers={'User-Agent' : 'Garlium'})
         return response.json()
 
     def get_csv(self, site, get_string):
         url = ''.join(['https://', site, get_string])
-        response = requests.request('GET', url, headers={'User-Agent' : 'Electrum'})
+        response = requests.request('GET', url, headers={'User-Agent' : 'Garlium'})
         reader = csv.DictReader(response.content.decode().split('\n'))
         return list(reader)
 
@@ -216,7 +216,7 @@ class OKCoin(ExchangeBase):
 class MercadoBitcoin(ExchangeBase):
 
     def get_rates(self,ccy):
-        json = self.get_json('mercadobitcoin.net', '/api/v2/ticker_litecoin')
+        json = self.get_json('mercadobitcoin.net', '/api/v2/ticker_garlicoin')
         return {'BRL': Decimal(json['ticker']['last'])}
 
 

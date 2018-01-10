@@ -81,7 +81,7 @@ class SimpleConfig(PrintError):
     def electrum_path(self):
         # Read electrum_path from command line / system configuration
         # Otherwise use the user's default data directory.
-        path = self.get('electrum_path')
+        path = self.get('garlium_path')
         if path is None:
             path = self.user_dir()
 
@@ -98,7 +98,7 @@ class SimpleConfig(PrintError):
             path = os.path.join(path, 'testnet')
             make_dir(path)
 
-        self.print_error("electrum directory", path)
+        self.print_error("garlium directory", path)
         return path
 
     def fixup_config_keys(self, config, keypairs):

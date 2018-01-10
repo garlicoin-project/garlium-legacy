@@ -16,8 +16,8 @@ os.system(cmd)
 
 os.chdir('lib')
 
-crowdin_identifier = 'electrum'
-crowdin_file_name = 'electrum-client/messages.pot'
+crowdin_identifier = 'garlium'
+crowdin_file_name = 'garlium-client/messages.pot'
 locale_file_name = 'locale/messages.pot'
 crowdin_api_key = None
 
@@ -48,7 +48,7 @@ zfobj = zipfile.ZipFile(io.BytesIO(s))
 
 print('Unzip translations')
 for name in zfobj.namelist():
-    if not name.startswith('electrum-client/locale'):
+    if not name.startswith('garlium-client/locale'):
         continue
     if name.endswith('/'):
         if not os.path.exists(name[16:]):
@@ -66,6 +66,6 @@ for lang in os.listdir('locale'):
     mo_dir = 'locale/%s/LC_MESSAGES' % lang
     if not os.path.exists(mo_dir):
         os.mkdir(mo_dir)
-    cmd = 'msgfmt --output-file="%s/electrum.mo" "locale/%s/electrum.po"' % (mo_dir,lang)
+    cmd = 'msgfmt --output-file="%s/garlium.mo" "locale/%s/garlium.po"' % (mo_dir,lang)
     print('Installing', lang)
     os.system(cmd)

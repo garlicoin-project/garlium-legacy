@@ -189,7 +189,7 @@ def init_daemon(config_options):
     storage = WalletStorage(config.get_wallet_path())
     if not storage.file_exists():
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum-ltc create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'garlium create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys.exit(0)
     if storage.is_encrypted():
         if config.get('password'):
@@ -224,7 +224,7 @@ def init_cmdline(config_options, server):
 
     if cmd.requires_wallet and not storage.file_exists():
         print_msg("Error: Wallet file not found.")
-        print_msg("Type 'electrum-ltc create' to create a new wallet, or provide a path to a wallet with the -w option")
+        print_msg("Type 'garlium create' to create a new wallet, or provide a path to a wallet with the -w option")
         sys.exit(0)
 
     # important warning
@@ -343,7 +343,7 @@ if __name__ == '__main__':
         config_options['portable'] = True
 
     if config_options.get('portable'):
-        config_options['electrum_path'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'electrum-ltc_data')
+        config_options['garlium_path'] = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'garlium_data')
 
     # kivy sometimes freezes when we write to sys.stderr
     set_verbosity(config_options.get('verbose') and config_options.get('gui')!='kivy')
@@ -351,7 +351,7 @@ if __name__ == '__main__':
     # check uri
     uri = config_options.get('url')
     if uri:
-        if not uri.startswith('litecoin:'):
+        if not uri.startswith('garlicoin:'):
             print_stderr('unknown command:', uri)
             sys.exit(1)
         config_options['url'] = uri
@@ -420,7 +420,7 @@ if __name__ == '__main__':
         else:
             cmd = known_commands[cmdname]
             if cmd.requires_network:
-                print_msg("Daemon not running; try 'electrum-ltc daemon start'")
+                print_msg("Daemon not running; try 'garlium daemon start'")
                 sys.exit(1)
             else:
                 init_plugins(config, 'cmdline')

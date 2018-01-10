@@ -8,7 +8,7 @@ from electrum_ltc import bitcoin
 try:
     addr = sys.argv[1]
 except Exception:
-    print("usage: get_history <litecoin_address>")
+    print("usage: get_history <garlicoin_address>")
     sys.exit(1)
 
 n = Network()

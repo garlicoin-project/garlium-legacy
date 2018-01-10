@@ -55,7 +55,7 @@ class Test_bitcoin(unittest.TestCase):
 
     def test_msg_signing(self):
         msg1 = b'Chancellor on brink of second bailout for banks'
-        msg2 = b'Electrum'
+        msg2 = b'Garlium'
 
         def sign_message_with_wif_privkey(wif_privkey, msg):
             txin_type, privkey, compressed = deserialize_privkey(wif_privkey)

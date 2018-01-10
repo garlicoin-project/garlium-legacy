@@ -26,11 +26,11 @@
 import gettext, os
 
 LOCALE_DIR = os.path.join(os.path.dirname(__file__), 'locale')
-language = gettext.translation('electrum', LOCALE_DIR, fallback = True)
+language = gettext.translation('garlium', LOCALE_DIR, fallback = True)
 
 def _(x):
     global language
-    dic = [('Bitcoin', 'Litecoin'), ('bitcoin', 'litecoin'), ('比特币', '莱特币')]
+    dic = [('Bitcoin', 'Garlicoin'), ('bitcoin', 'garlicoin'), ('比特币', '莱特币')]
     for b, l in dic:
         x = x.replace(l, b)
     t = language.gettext(x)
@@ -40,7 +40,7 @@ def _(x):
 
 def set_language(x):
     global language
-    if x: language = gettext.translation('electrum', LOCALE_DIR, fallback = True, languages=[x])
+    if x: language = gettext.translation('garlium', LOCALE_DIR, fallback = True, languages=[x])
 
 
 languages = {
