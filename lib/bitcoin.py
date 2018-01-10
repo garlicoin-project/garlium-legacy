@@ -47,21 +47,19 @@ def read_json(filename, default):
     return r
 
 
-
-
 # Version numbers for BIP32 extended keys
 # standard: xprv, xpub
 # segwit in p2sh: yprv, ypub
 # native segwit: zprv, zpub
 XPRV_HEADERS = {
-    'standard': 0x0488ade4,
+    'standard': 0x019da462,
     'p2wpkh-p2sh': 0x049d7878,
     'p2wsh-p2sh': 0x295b005,
     'p2wpkh': 0x4b2430c,
     'p2wsh': 0x2aa7a99
 }
 XPUB_HEADERS = {
-    'standard': 0x0488b21e,
+    'standard': 0x019d9cfe,
     'p2wpkh-p2sh': 0x049d7cb2,
     'p2wsh-p2sh': 0x295b43f,
     'p2wpkh': 0x4b24746,
@@ -75,10 +73,10 @@ class NetworkConstants:
     def set_mainnet(cls):
         cls.TESTNET = False
         cls.WIF_PREFIX = 0x80
-        cls.ADDRTYPE_P2PKH = 48
+        cls.ADDRTYPE_P2PKH = 38
         cls.ADDRTYPE_P2SH = 50
-        cls.SEGWIT_HRP = "ltc"
-        cls.GENESIS = "12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2"
+        cls.SEGWIT_HRP = "grlc"
+        cls.GENESIS = ""
         cls.DEFAULT_PORTS = {'t': '50001', 's': '50002'}
         cls.DEFAULT_SERVERS = read_json('servers.json', {})
         cls.CHECKPOINTS = read_json('checkpoints.json', [])
@@ -89,12 +87,11 @@ class NetworkConstants:
         cls.WIF_PREFIX = 0xbf
         cls.ADDRTYPE_P2PKH = 111
         cls.ADDRTYPE_P2SH = 58
-        cls.SEGWIT_HRP = "tltc"
-        cls.GENESIS = "4966625a4b2851d9fdee139e56211a0d88575f59ed816ff5e6a63deb4e3e29a0"
+        cls.SEGWIT_HRP = "tgrlc"
+        cls.GENESIS = "e99da841b29de092a847214f1af5abf6ef38a50f607081b09692177555e5855e"
         cls.DEFAULT_PORTS = {'t':'51001', 's':'51002'}
         cls.DEFAULT_SERVERS = read_json('servers_testnet.json', {})
         cls.CHECKPOINTS = read_json('checkpoints_testnet.json', [])
-
 
 NetworkConstants.set_mainnet()
 

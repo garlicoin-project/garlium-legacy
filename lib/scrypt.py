@@ -19,7 +19,7 @@
 import hashlib
 import hmac
 
-def scrypt_1024_1_1_80(header):
+def scrypt_2048_1_1_80(header):
     if not isinstance(header, bytes) or len(header) != 80:
         raise ValueError('header must be 80 bytes')
 
@@ -38,12 +38,12 @@ def scrypt_1024_1_1_80(header):
             X[i*8 + j] = (H[j*4 + 0] << 0 | H[j*4 + 1] << 8 |
                           H[j*4 + 2] << 16 | H[j*4 + 3] << 24)
 
-    for i in range(1024):
+    for i in range(2048):
         V[i*32:i*32+32] = X
         _xor_salsa8_2(X)
 
-    for i in range(1024):
-        k = (X[16] & 1023) * 32
+    for i in range(2048):
+        k = (X[16] & 2047) * 32
         for j in range(32):
             X[j] ^= V[k+j]
         _xor_salsa8_2(X)
