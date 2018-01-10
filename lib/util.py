@@ -242,7 +242,7 @@ def android_check_data_dir():
     """ if needed, move old directory to sandbox """
     ext_dir = android_ext_dir()
     data_dir = android_data_dir()
-    old_electrum_dir = ext_dir + '/electrum-ltc'
+    old_electrum_dir = ext_dir + '/garlium'
     if not os.path.exists(data_dir) and os.path.exists(old_electrum_dir):
         import shutil
         new_headers_path = android_headers_dir() + '/blockchain_headers'
@@ -323,11 +323,11 @@ def user_dir():
     if 'ANDROID_DATA' in os.environ:
         return android_check_data_dir()
     elif os.name == 'posix':
-        return os.path.join(os.environ["HOME"], ".electrum-ltc")
+        return os.path.join(os.environ["HOME"], ".garlium")
     elif "APPDATA" in os.environ:
-        return os.path.join(os.environ["APPDATA"], "Electrum-LTC")
+        return os.path.join(os.environ["APPDATA"], "Garlium")
     elif "LOCALAPPDATA" in os.environ:
-        return os.path.join(os.environ["LOCALAPPDATA"], "Electrum-LTC")
+        return os.path.join(os.environ["LOCALAPPDATA"], "Garlium")
     else:
         #raise Exception("No home directory found in environment variables.")
         return

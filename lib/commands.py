@@ -81,7 +81,7 @@ def command(s):
             wallet = args[0].wallet
             password = kwargs.get('password')
             if c.requires_wallet and wallet is None:
-                raise BaseException("wallet not loaded. Use 'electrum-ltc daemon load_wallet'")
+                raise BaseException("wallet not loaded. Use 'garlium daemon load_wallet'")
             if c.requires_password and password is None and wallet.storage.get('use_encryption'):
                 return {'error': 'Password required' }
             return func(*args, **kwargs)
@@ -288,7 +288,7 @@ class Commands:
     @command('')
     def dumpprivkeys(self):
         """Deprecated."""
-        return "This command is deprecated. Use a pipe instead: 'electrum-ltc listaddresses | electrum-ltc getprivatekeys - '"
+        return "This command is deprecated. Use a pipe instead: 'garlium listaddresses | garlium getprivatekeys - '"
 
     @command('')
     def validateaddress(self, address):
@@ -754,10 +754,10 @@ config_variables = {
         'requests_dir': 'directory where a bip70 file will be written.',
         'ssl_privkey': 'Path to your SSL private key, needed to sign the request.',
         'ssl_chain': 'Chain of SSL certificates, needed for signed requests. Put your certificate at the top and the root CA at the end',
-        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of litecoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum-ltc.org/\')\"',
+        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of litecoin: URIs. Example: \"(\'file:///var/www/\',\'https://garlium.org/\')\"',
     },
     'listrequests':{
-        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of litecoin: URIs. Example: \"(\'file:///var/www/\',\'https://electrum-ltc.org/\')\"',
+        'url_rewrite': 'Parameters passed to str.replace(), in order to create the r= part of litecoin: URIs. Example: \"(\'file:///var/www/\',\'https://garlium.org/\')\"',
     }
 }
 
@@ -830,7 +830,7 @@ def add_global_options(parser):
 def get_parser():
     # create main parser
     parser = argparse.ArgumentParser(
-        epilog="Run 'electrum-ltc help <command>' to see the help for a command")
+        epilog="Run 'garlium help <command>' to see the help for a command")
     add_global_options(parser)
     subparsers = parser.add_subparsers(dest='cmd', metavar='<command>')
     # gui

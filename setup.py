@@ -12,7 +12,7 @@ import argparse
 version = imp.load_source('version', 'lib/version.py')
 
 if sys.version_info[:3] < (3, 4, 0):
-    sys.exit("Error: Electrum requires Python version >= 3.4.0...")
+    sys.exit("Error: Garlium requires Python version >= 3.4.0...")
 
 data_files = []
 
@@ -28,12 +28,12 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
         else:
             usr_share = os.path.expanduser('~/.local/share')
     data_files += [
-        (os.path.join(usr_share, 'applications/'), ['electrum-ltc.desktop']),
+        (os.path.join(usr_share, 'applications/'), ['garlium.desktop']),
         (os.path.join(usr_share, 'pixmaps/'), ['icons/electrum-ltc.png'])
     ]
 
 setup(
-    name="Electrum-LTC",
+    name="Garlium",
     version=version.ELECTRUM_VERSION,
     install_requires=[
         'pyaes>=0.1a1',
@@ -80,12 +80,12 @@ setup(
             'locale/*/LC_MESSAGES/electrum.mo',
         ]
     },
-    scripts=['electrum-ltc'],
+    scripts=['garlium'],
     data_files=data_files,
-    description="Lightweight Litecoin Wallet",
+    description="Lightweight Garlium Wallet",
     author="Thomas Voegtlin",
     author_email="thomasv@electrum.org",
     license="MIT Licence",
     url="http://electrum-ltc.org",
-    long_description="""Lightweight Litecoin Wallet"""
+    long_description="""Lightweight Garlicoin Wallet"""
 )
