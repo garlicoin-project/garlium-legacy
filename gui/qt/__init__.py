@@ -54,7 +54,7 @@ try:
 except Exception as e:
     print(e)
     print("Error: Could not find icons file.")
-    print("Please run 'pyrcc5 icons.qrc -o gui/qt/icons_rc.py', and reinstall Electrum")
+    print("Please run 'pyrcc5 icons.qrc -o gui/qt/icons_rc.py', and reinstall Garlium")
     sys.exit(1)
 
 from .util import *   # * needed for plugins
@@ -105,7 +105,7 @@ class ElectrumGui:
         # init tray
         self.dark_icon = self.config.get("dark_icon", False)
         self.tray = QSystemTrayIcon(self.tray_icon(), None)
-        self.tray.setToolTip('Electrum-LTC')
+        self.tray.setToolTip('Garlium')
         self.tray.activated.connect(self.tray_activated)
         self.build_tray_menu()
         self.tray.show()
@@ -127,13 +127,13 @@ class ElectrumGui:
             submenu.addAction(_("Close"), window.close)
         m.addAction(_("Dark/Light"), self.toggle_tray_icon)
         m.addSeparator()
-        m.addAction(_("Exit Electrum-LTC"), self.close)
+        m.addAction(_("Exit Garlium"), self.close)
 
     def tray_icon(self):
         if self.dark_icon:
-            return QIcon(':icons/electrum_dark_icon.png')
+            return QIcon(':icons/garlium_dark_icon.png')
         else:
-            return QIcon(':icons/electrum_light_icon.png')
+            return QIcon(':icons/garlium_light_icon.png')
 
     def toggle_tray_icon(self):
         self.dark_icon = not self.dark_icon
@@ -159,7 +159,7 @@ class ElectrumGui:
 
     def show_network_dialog(self, parent):
         if not self.daemon.network:
-            parent.show_warning(_('You are using Electrum in offline mode; restart Electrum if you want to get connected'), title=_('Offline'))
+            parent.show_warning(_('You are using Garlium in offline mode; restart Garlium if you want to get connected'), title=_('Offline'))
             return
         if self.nd:
             self.nd.on_update()

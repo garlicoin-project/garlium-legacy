@@ -159,7 +159,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if self.config.get("is_maximized"):
             self.showMaximized()
 
-        self.setWindowIcon(QIcon(":icons/electrum-ltc.png"))
+        self.setWindowIcon(QIcon(":icons/garlium.png"))
         self.init_menubar()
 
         wrtabs = weakref.proxy(tabs)
@@ -363,7 +363,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.setGeometry(100, 100, 840, 400)
 
     def watching_only_changed(self):
-        name = "Electrum-LTC Testnet" if NetworkConstants.TESTNET else "Electrum-LTC"
+        name = "Garlium Testnet" if NetworkConstants.TESTNET else "Garlium"
         title = '%s %s  -  %s' % (name, self.wallet.electrum_version,
                                         self.wallet.basename())
         extra = [self.wallet.storage.get('wallet_type', '?')]
@@ -381,8 +381,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if self.wallet.is_watching_only():
             msg = ' '.join([
                 _("This wallet is watching-only."),
-                _("This means you will not be able to spend litecoins with it."),
-                _("Make sure you own the seed phrase or the private keys, before you request litecoins to be sent to this wallet.")
+                _("This means you will not be able to spend garlicoins with it."),
+                _("Make sure you own the seed phrase or the private keys, before you request garlicoins to be sent to this wallet.")
             ])
             self.show_warning(msg, title=_('Information'))
 
@@ -407,7 +407,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 shutil.copy2(path, new_path)
                 self.show_message(_("A copy of your wallet file was created in")+" '%s'" % str(new_path), title=_("Wallet backup created"))
             except (IOError, os.error) as reason:
-                self.show_critical(_("Electrum was unable to copy your wallet file to the specified location.") + "\n" + str(reason), title=_("Unable to create backup"))
+                self.show_critical(_("Garlium was unable to copy your wallet file to the specified location.") + "\n" + str(reason), title=_("Unable to create backup"))
 
     def update_recently_visited(self, filename):
         recent = self.config.get('recently_open', [])
@@ -496,7 +496,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         tools_menu = menubar.addMenu(_("&Tools"))
 
         # Settings / Preferences are all reserved keywords in OSX using this as work around
-        tools_menu.addAction(_("Electrum preferences") if sys.platform == 'darwin' else _("Preferences"), self.settings_dialog)
+        tools_menu.addAction(_("Garlium preferences") if sys.platform == 'darwin' else _("Preferences"), self.settings_dialog)
         tools_menu.addAction(_("&Network"), lambda: self.gui_object.show_network_dialog(self))
         tools_menu.addAction(_("&Plugins"), self.plugins_dialog)
         tools_menu.addSeparator()
@@ -516,9 +516,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         help_menu = menubar.addMenu(_("&Help"))
         help_menu.addAction(_("&About"), self.show_about)
-        help_menu.addAction(_("&Official website"), lambda: webbrowser.open("http://electrum-ltc.org"))
+        help_menu.addAction(_("&Official website"), lambda: webbrowser.open("http://garlium.org"))
         help_menu.addSeparator()
-        help_menu.addAction(_("&Documentation"), lambda: webbrowser.open("http://docs.electrum.org/")).setShortcut(QKeySequence.HelpContents)
+        help_menu.addAction(_("&Documentation"), lambda: webbrowser.open("http://docs.garlium.org/")).setShortcut(QKeySequence.HelpContents)
         help_menu.addAction(_("&Report Bug"), self.show_report_bug)
         help_menu.addSeparator()
         help_menu.addAction(_("&Donate to server"), self.donate_to_server)
@@ -529,24 +529,24 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         d = self.network.get_donation_address()
         if d:
             host = self.network.get_parameters()[0]
-            self.pay_to_URI('litecoin:%s?message=donation for %s'%(d, host))
+            self.pay_to_URI('garlicoin:%s?message=donation for %s'%(d, host))
         else:
             self.show_error(_('No donation address for this server'))
 
     def show_about(self):
-        QMessageBox.about(self, "Electrum-LTC",
+        QMessageBox.about(self, "Garlium",
             _("Version")+" %s" % (self.wallet.electrum_version) + "\n\n" +
-                _("Electrum's focus is speed, with low resource usage and simplifying Litecoin. You do not need to perform regular backups, because your wallet can be recovered from a secret phrase that you can memorize or write on paper. Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the Litecoin system."  + "\n\n" +
+                _("Garlium's focus is speed, with low resource usage and simplifying Garlicoin. You do not need to perform regular backups, because your wallet can be recovered from a secret phrase that you can memorize or write on paper. Startup times are instant because it operates in conjunction with high-performance servers that handle the most complicated parts of the Garlicoin system."  + "\n\n" +
                 _("Uses icons from the Icons8 icon pack (icons8.com).")))
 
     def show_report_bug(self):
         msg = ' '.join([
             _("Please report any bugs as issues on github:<br/>"),
-            "<a href=\"https://github.com/pooler/electrum-ltc/issues\">https://github.com/pooler/electrum-ltc/issues</a><br/><br/>",
-            _("Before reporting a bug, upgrade to the most recent version of Electrum (latest release or git HEAD), and include the version number in your report."),
+            "<a href=\"https://github.com/pooler/garlium/issues\">https://github.com/pooler/garlium/issues</a><br/><br/>",
+            _("Before reporting a bug, upgrade to the most recent version of Garlium (latest release or git HEAD), and include the version number in your report."),
             _("Try to explain not only what the bug is, but how it occurs.")
          ])
-        self.show_message(msg, title="Electrum-LTC - " + _("Reporting Bugs"))
+        self.show_message(msg, title="Garlium - " + _("Reporting Bugs"))
 
     def notify_transactions(self):
         if not self.network or not self.network.is_connected():
@@ -576,9 +576,9 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if self.tray:
             try:
                 # this requires Qt 5.9
-                self.tray.showMessage("Electrum-LTC", message, QIcon(":icons/electrum_dark_icon"), 20000)
+                self.tray.showMessage("Garlium", message, QIcon(":icons/garlium_dark_icon"), 20000)
             except TypeError:
-                self.tray.showMessage("Electrum-LTC", message, QSystemTrayIcon.Information, 20000)
+                self.tray.showMessage("Garlium", message, QSystemTrayIcon.Information, 20000)
 
 
 
@@ -636,11 +636,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
     def base_unit(self):
         assert self.decimal_point in [2, 5, 8]
         if self.decimal_point == 2:
-            return 'bits'
+            return 'cloves'
         if self.decimal_point == 5:
-            return 'mLTC'
+            return 'mGRLC'
         if self.decimal_point == 8:
-            return 'LTC'
+            return 'GRLC'
         raise Exception('Unknown base unit')
 
     def connect_fields(self, window, btc_e, fiat_e, fee_e):
@@ -764,7 +764,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.receive_address_e = ButtonsLineEdit()
         self.receive_address_e.addCopyButton(self.app)
         self.receive_address_e.setReadOnly(True)
-        msg = _('Litecoin address where the payment should be received. Note that each payment request uses a different Litecoin address.')
+        msg = _('Garlicoin address where the payment should be received. Note that each payment request uses a different Garlicoin address.')
         self.receive_address_label = HelpLabel(_('Receiving address'), msg)
         self.receive_address_e.textChanged.connect(self.update_receive_qr)
         self.receive_address_e.setFocusPolicy(Qt.NoFocus)
@@ -794,8 +794,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         msg = ' '.join([
             _('Expiration date of your request.'),
             _('This information is seen by the recipient if you send them a signed payment request.'),
-            _('Expired requests have to be deleted manually from your list, in order to free the corresponding Litecoin addresses.'),
-            _('The Litecoin address never expires and will always be part of this Electrum wallet.'),
+            _('Expired requests have to be deleted manually from your list, in order to free the corresponding Garlicoin addresses.'),
+            _('The Garlicoin address never expires and will always be part of this Garlium wallet.'),
         ])
         grid.addWidget(HelpLabel(_('Request expires'), msg), 3, 0)
         grid.addWidget(self.expires_combo, 3, 1)
@@ -1010,7 +1010,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.amount_e = BTCAmountEdit(self.get_decimal_point)
         self.payto_e = PayToEdit(self)
         msg = _('Recipient of the funds.') + '\n\n'\
-              + _('You may enter a Litecoin address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a Litecoin address)')
+              + _('You may enter a Garlicoin address, a label from your list of contacts (a list of completions will be proposed), or an alias (email-like address that forwards to a Garlicoin address)')
         payto_label = HelpLabel(_('Pay to'), msg)
         grid.addWidget(payto_label, 1, 0)
         grid.addWidget(self.payto_e, 1, 1, 1, -1)
@@ -1057,7 +1057,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         hbox.addStretch(1)
         grid.addLayout(hbox, 4, 4)
 
-        msg = _('Litecoin transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
+        msg = _('Garlicoin transactions are in general not free. A transaction fee is paid by the sender of the funds.') + '\n\n'\
               + _('The amount of fee can be decided freely by the sender. However, transactions with low fees take more time to be processed.') + '\n\n'\
               + _('A suggested fee is automatically added to this field. You may override it. The suggested fee increases with the size of the transaction.')
         self.fee_e_label = HelpLabel(_('Fee'), msg)
@@ -1389,10 +1389,10 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         for _type, addr, amount in outputs:
             if addr is None:
-                self.show_error(_('Litecoin Address is None'))
+                self.show_error(_('Garlicoin Address is None'))
                 return
             if _type == TYPE_ADDRESS and not bitcoin.is_address(addr):
-                self.show_error(_('Invalid Litecoin Address'))
+                self.show_error(_('Invalid Garlicoin Address'))
                 return
             if amount is None:
                 self.show_error(_('Invalid Amount'))
@@ -1605,7 +1605,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         try:
             out = util.parse_URI(URI, self.on_pr)
         except BaseException as e:
-            self.show_error(_('Invalid litecoin URI:') + '\n' + str(e))
+            self.show_error(_('Invalid garlicoin URI:') + '\n' + str(e))
             return
         self.show_send_tab()
         r = out.get('r')
@@ -2021,14 +2021,14 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 "private key, and verifying with the corresponding public key. The "
                 "address you have entered does not have a unique public key, so these "
                 "operations cannot be performed.") + '\n\n' + \
-               _('The operation is undefined. Not just in Electrum, but in general.')
+               _('The operation is undefined. Not just in Garlium, but in general.')
 
     @protected
     def do_sign(self, address, message, signature, password):
         address  = address.text().strip()
         message = message.toPlainText().strip()
         if not bitcoin.is_address(address):
-            self.show_message(_('Invalid Litecoin address.'))
+            self.show_message(_('Invalid Garlicoin address.'))
             return
         if not self.wallet.is_mine(address):
             self.show_message(_('Address not in wallet.'))
@@ -2048,7 +2048,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         address  = address.text().strip()
         message = message.toPlainText().strip().encode('utf-8')
         if not bitcoin.is_address(address):
-            self.show_message(_('Invalid Litecoin address.'))
+            self.show_message(_('Invalid Garlicoin address.'))
             return
         try:
             # This can throw on invalid base64
@@ -2165,7 +2165,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             tx = tx_from_str(txt)
             return Transaction(tx)
         except BaseException as e:
-            self.show_critical(_("Electrum was unable to parse your transaction") + ":\n" + str(e))
+            self.show_critical(_("Garlium was unable to parse your transaction") + ":\n" + str(e))
             return
 
     def read_tx_from_qrcode(self):
@@ -2178,7 +2178,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         if not data:
             return
         # if the user scanned a bitcoin URI
-        if str(data).startswith("litecoin:"):
+        if str(data).startswith("garlicoin:"):
             self.pay_to_URI(data)
             return
         # else if the user scanned an offline signed tx
@@ -2196,7 +2196,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             with open(fileName, "r") as f:
                 file_content = f.read()
         except (ValueError, IOError, os.error) as reason:
-            self.show_critical(_("Electrum was unable to open your transaction file") + "\n" + str(reason), title=_("Unable to read file or no transaction found"))
+            self.show_critical(_("Garlium was unable to open your transaction file") + "\n" + str(reason), title=_("Unable to read file or no transaction found"))
             return
         return self.tx_from_text(file_content)
 
@@ -2210,7 +2210,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             if tx:
                 self.show_transaction(tx)
         except SerializationError as e:
-            self.show_critical(_("Electrum was unable to deserialize the transaction:") + "\n" + str(e))
+            self.show_critical(_("Garlium was unable to deserialize the transaction:") + "\n" + str(e))
 
     def do_process_from_file(self):
         from electrum_ltc.transaction import SerializationError
@@ -2219,7 +2219,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             if tx:
                 self.show_transaction(tx)
         except SerializationError as e:
-            self.show_critical(_("Electrum was unable to deserialize the transaction:") + "\n" + str(e))
+            self.show_critical(_("Garlium was unable to deserialize the transaction:") + "\n" + str(e))
 
     def do_process_from_txid(self):
         from electrum_ltc import transaction
@@ -2253,7 +2253,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         e.setReadOnly(True)
         vbox.addWidget(e)
 
-        defaultname = 'electrum-ltc-private-keys.csv'
+        defaultname = 'garlium-private-keys.csv'
         select_msg = _('Select file to export your private keys to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)
@@ -2298,7 +2298,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             self.do_export_privkeys(filename, private_keys, csv_button.isChecked())
         except (IOError, os.error) as reason:
             txt = "\n".join([
-                _("Electrum was unable to produce a private key-export."),
+                _("Garlium was unable to produce a private key-export."),
                 str(reason)
             ])
             self.show_critical(txt, title=_("Unable to create csv"))
@@ -2330,26 +2330,26 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 self.wallet.set_label(key, value)
             self.show_message(_("Your labels were imported from") + " '%s'" % str(labelsFile))
         except (IOError, os.error) as reason:
-            self.show_critical(_("Electrum was unable to import your labels.") + "\n" + str(reason))
+            self.show_critical(_("Garlium was unable to import your labels.") + "\n" + str(reason))
         self.address_list.update()
         self.history_list.update()
 
     def do_export_labels(self):
         labels = self.wallet.labels
         try:
-            fileName = self.getSaveFileName(_("Select file to save your labels"), 'electrum-ltc_labels.json', "*.json")
+            fileName = self.getSaveFileName(_("Select file to save your labels"), 'garlium_labels.json', "*.json")
             if fileName:
                 with open(fileName, 'w+') as f:
                     json.dump(labels, f, indent=4, sort_keys=True)
                 self.show_message(_("Your labels were exported to") + " '%s'" % str(fileName))
         except (IOError, os.error) as reason:
-            self.show_critical(_("Electrum was unable to export your labels.") + "\n" + str(reason))
+            self.show_critical(_("Garlium was unable to export your labels.") + "\n" + str(reason))
 
     def export_history_dialog(self):
         d = WindowModalDialog(self, _('Export History'))
         d.setMinimumSize(400, 200)
         vbox = QVBoxLayout(d)
-        defaultname = os.path.expanduser('~/electrum-ltc-history.csv')
+        defaultname = os.path.expanduser('~/garlium-history.csv')
         select_msg = _('Select file to export your wallet transactions to')
         hbox, filename_e, csv_button = filename_field(self, self.config, defaultname, select_msg)
         vbox.addLayout(hbox)
@@ -2366,7 +2366,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         try:
             self.do_export_history(self.wallet, filename, csv_button.isChecked())
         except (IOError, os.error) as reason:
-            export_error_label = _("Electrum was unable to produce a transaction export.")
+            export_error_label = _("Garlium was unable to produce a transaction export.")
             self.show_critical(export_error_label + "\n" + str(reason), title=_("Unable to export history"))
             return
         self.show_message(_("Your wallet history has been successfully exported."))
@@ -2599,7 +2599,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.fee_unit = self.config.get('fee_unit', 0)
         fee_unit_label = HelpLabel(_('Fee Unit') + ':', '')
         fee_unit_combo = QComboBox()
-        fee_unit_combo.addItems([_('sat/byte'), _('mLTC/kB')])
+        fee_unit_combo.addItems([_('sat/byte'), _('mGRLC/kB')])
         fee_unit_combo.setCurrentIndex(self.fee_unit)
         def on_fee_unit(x):
             self.fee_unit = x
@@ -2658,7 +2658,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         SSL_id_e.setReadOnly(True)
         id_widgets.append((SSL_id_label, SSL_id_e))
 
-        units = ['LTC', 'mLTC', 'bits']
+        units = ['GRLC', 'mGRLC', 'cloves']
         msg = _('Base unit of your wallet.')\
               + '\n1LTC=1000mLTC.\n' \
               + _(' These settings affects the fields in the Send tab')+' '
@@ -2672,11 +2672,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
                 return
             edits = self.amount_e, self.fee_e, self.receive_amount_e
             amounts = [edit.get_amount() for edit in edits]
-            if unit_result == 'LTC':
+            if unit_result == 'GRLC':
                 self.decimal_point = 8
-            elif unit_result == 'mLTC':
+            elif unit_result == 'mGRLC':
                 self.decimal_point = 5
-            elif unit_result == 'bits':
+            elif unit_result == 'cloves':
                 self.decimal_point = 2
             else:
                 raise Exception('Unknown base unit')
@@ -2896,7 +2896,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         run_hook('close_settings_dialog')
         if self.need_restart:
-            self.show_warning(_('Please restart Electrum to activate the new GUI settings'), title=_('Success'))
+            self.show_warning(_('Please restart Garlium to activate the new GUI settings'), title=_('Success'))
 
 
     def closeEvent(self, event):
@@ -2923,7 +2923,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.gui_object.close_window(self)
 
     def plugins_dialog(self):
-        self.pluginsdialog = d = WindowModalDialog(self, _('Electrum Plugins'))
+        self.pluginsdialog = d = WindowModalDialog(self, _('Garlium Plugins'))
 
         plugins = self.gui_object.plugins
 
