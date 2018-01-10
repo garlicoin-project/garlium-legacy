@@ -69,7 +69,7 @@ setup(
         'electrum_ltc_plugins': 'plugins',
     },
     package_data={
-        'garlium_ltc': [
+        'electrum_ltc': [
             'servers.json',
             'servers_testnet.json',
             'currencies.json',

@@ -11,13 +11,13 @@ else:
     raise BaseException('no name')
 
 
-home = 'C:\\garlium\\'
+home = '../../'
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
 hiddenimports = []
 hiddenimports += collect_submodules('trezorlib')
 hiddenimports += collect_submodules('btchip')
-hiddenimports += collect_submodules('keepkeylib')
+#hiddenimports += collect_submodules('keepkeylib')
 hiddenimports += ['_scrypt']
 
 datas = [
@@ -27,12 +27,12 @@ datas = [
     (home+'lib/servers_testnet.json', 'electrum_ltc'),
     (home+'lib/checkpoints_testnet.json', 'electrum_ltc'),
     (home+'lib/wordlist/english.txt', 'electrum_ltc/wordlist'),
-    (home+'lib/locale', 'electrum_ltc/locale'),
+#    (home+'lib/locale', 'electrum_ltc/locale'),
     (home+'plugins', 'electrum_ltc_plugins'),
 ]
 datas += collect_data_files('trezorlib')
 datas += collect_data_files('btchip')
-datas += collect_data_files('keepkeylib')
+#datas += collect_data_files('keepkeylib')
 
 # We don't put these files in to actually include them in the script but to make the Analysis method scan them for imports
 a = Analysis([home+'garlium',
@@ -83,7 +83,7 @@ exe_standalone = EXE(
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/garlium.ico',
     console=False)
     # console=True makes an annoying black box pop up, but it does make Electrum output command line commands, with this turned off no output will be given but commands can still be used
 
@@ -96,7 +96,7 @@ exe_portable = EXE(
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/garlium.ico',
     console=False)
 
 #####
@@ -110,7 +110,7 @@ exe_dependent = EXE(
     debug=False,
     strip=None,
     upx=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/garlium.ico',
     console=False)
 
 coll = COLLECT(
@@ -121,6 +121,6 @@ coll = COLLECT(
     strip=None,
     upx=True,
     debug=False,
-    icon=home+'icons/electrum.ico',
+    icon=home+'icons/garlium.ico',
     console=False,
     name=os.path.join('dist', 'garlium'))
