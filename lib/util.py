@@ -440,8 +440,10 @@ mainnet_block_explorers = {
 }
 
 testnet_block_explorers = {
-    'SoChain': ('https://chain.so',
-                        {'tx': 'tx/LTCTEST', 'addr': 'address/LTCTEST'}),
+    'Bakery': ('https://explorer.grlc-bakery.fun',
+                        {'tx': 'tx', 'addr': 'address'}),
+    'explorer.garlicoin.net': ('http://explorer.garlicoin.net',
+                        {'tx': 'tx', 'addr': 'address'}),
     'system default': ('blockchain:',
                        {'tx': 'tx', 'addr': 'address'}),
 }
