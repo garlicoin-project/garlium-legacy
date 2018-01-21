@@ -51,6 +51,7 @@ def read_json(filename, default):
 # standard: xprv, xpub
 # segwit in p2sh: yprv, ypub
 # native segwit: zprv, zpub
+# TODO: launch?? what is this
 XPRV_HEADERS = {
     'standard': 0x019da462,
     'p2wpkh-p2sh': 0x049d7878,
@@ -74,12 +75,15 @@ class NetworkConstants:
         cls.TESTNET = False
         cls.WIF_PREFIX = 0x80
         cls.ADDRTYPE_P2PKH = 38
-        cls.ADDRTYPE_P2SH = 50
+        cls.ADDRTYPE_P2SH = 50 # todo: what is this
         cls.SEGWIT_HRP = "grlc"
-        cls.GENESIS = ""
+        cls.GENESIS = "2ada80bf415a89358d697569c96eb98cdbf4c3b8878ac5722c01284492e27228" # todo: launch
         cls.DEFAULT_PORTS = {'t': '50001', 's': '50002'}
         cls.DEFAULT_SERVERS = read_json('servers.json', {})
         cls.CHECKPOINTS = read_json('checkpoints.json', [])
+        cls.ADAPTIVE_N_EPOCH = 1515925970 # todo: launch
+        cls.ADAPTIVE_N_INTERVAL = 36288000 # todo: launch
+        cls.ADAPTIVE_N_INITIAL = 10 # todo: launch
 
     @classmethod
     def set_testnet(cls):
@@ -92,6 +96,9 @@ class NetworkConstants:
         cls.DEFAULT_PORTS = {'t':'51001', 's':'51002'}
         cls.DEFAULT_SERVERS = read_json('servers_testnet.json', {})
         cls.CHECKPOINTS = read_json('checkpoints_testnet.json', [])
+        cls.ADAPTIVE_N_EPOCH = 1515002093
+        cls.ADAPTIVE_N_INTERVAL = 437676
+        cls.ADAPTIVE_N_INITIAL = 9
 
 NetworkConstants.set_mainnet()
 

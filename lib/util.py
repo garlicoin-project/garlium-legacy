@@ -172,7 +172,7 @@ class DaemonThread(threading.Thread, PrintError):
 is_verbose = True
 def set_verbosity(b):
     global is_verbose
-    is_verbose = b
+    #is_verbose = b
 
 
 def print_error(*args):

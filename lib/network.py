@@ -787,7 +787,7 @@ class Network(util.DaemonThread):
         self.notify('updated')
 
     def request_header(self, interface, height):
-        #interface.print_error("requesting header %d" % height)
+        interface.print_error("requesting header %d" % height)
         self.queue_request('blockchain.block.get_header', [height], interface)
         interface.request = height
         interface.req_time = time.time()

@@ -27,12 +27,19 @@ from . import util
 from . import bitcoin
 from .bitcoin import *
 
+def get_n_factor(timestamp):
+    return 9
+    #return (timestamp - NetworkConstants.ADAPTIVE_N_EPOCH) // NetworkConstants.ADAPTIVE_N_INTERVAL + NetworkConstants.ADAPTIVE_N_INITIAL
+
 try:
     import scrypt
-    getPoWHash = lambda x: scrypt.hash(x, x, N=1024, r=1, p=1, buflen=32)
+
+    getPoWHash = lambda x, t: scrypt.hash(x, x, N=(2 << get_n_factor(t)), r=1, p=1, buflen=32)
 except ImportError:
     util.print_msg("Warning: package scrypt not available; synchronization could be very slow")
-    from .scrypt import scrypt_1024_1_1_80 as getPoWHash
+
+    from .scrypt import scrypt_n_1_1_80
+    getPoWHash = lambda x, t: scrypt_n_1_1_80(x, (2 << get_n_factor(t)))
 
 MAX_TARGET = 0x00000FFFFF000000000000000000000000000000000000000000000000000000
 
@@ -65,7 +72,7 @@ def hash_header(header):
     return hash_encode(Hash(bfh(serialize_header(header))))
 
 def pow_hash_header(header):
-    return hash_encode(getPoWHash(bfh(serialize_header(header))))
+    return hash_encode(getPoWHash(bfh(serialize_header(header)), header["timestamp"]))
 
 
 blockchains = {}
@@ -163,7 +170,7 @@ class Blockchain(util.PrintError):
         _powhash = pow_hash_header(header)
         if prev_hash != header.get('prev_block_hash'):
             raise BaseException("prev hash mismatch: %s vs %s" % (prev_hash, header.get('prev_block_hash')))
-        if bitcoin.NetworkConstants.TESTNET:
+        if True or bitcoin.NetworkConstants.TESTNET: # TODO: unsafe, fix DGW
             return
         bits = self.target_to_bits(target)
         if bits != header.get('bits'):
@@ -289,6 +296,7 @@ class Blockchain(util.PrintError):
         return self.read_header(height).get('timestamp')
 
     def get_target(self, index):
+        # TODO: dark gravity wave
         # compute target from chunk x, used in chunk x+1
         if bitcoin.NetworkConstants.TESTNET:
             return 0
