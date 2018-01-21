@@ -18,25 +18,26 @@ set -e
 
 cd tmp
 
-for repo in garlium garlium-locale garlium-icons; do
-    if [ -d $repo ]; then
-	cd $repo
-	git pull
-	git checkout master
-	cd ..
-    else
-	URL=https://github.com/pooler/$repo.git
-	git clone -b master $URL $repo
-    fi
-done
+git clone -b master https://github.com/xSke/garlium.git
+#for repo in garlium garlium-locale garlium-icons; do
+#    if [ -d $repo ]; then
+#	cd $repo
+#	git pull
+#	git checkout master
+#	cd ..
+#    else
+#	URL=https://github.com/pooler/$repo.git
+#	git clone -b master $URL $repo
+#    fi
+#done
 
-pushd garlium-locale
-for i in ./locale/*; do
-    dir=$i/LC_MESSAGES
-    mkdir -p $dir
-    msgfmt --output-file=$dir/electrum.mo $i/electrum.po || true
-done
-popd
+#pushd garlium-locale
+#for i in ./locale/*; do
+#    dir=$i/LC_MESSAGES
+#    mkdir -p $dir
+#    msgfmt --output-file=$dir/electrum.mo $i/electrum.po || true
+#done
+#popd
 
 pushd garlium
 if [ ! -z "$1" ]; then
@@ -51,8 +52,8 @@ popd
 rm -rf $WINEPREFIX/drive_c/garlium
 cp -r garlium $WINEPREFIX/drive_c/garlium
 cp garlium/LICENCE .
-cp -r garlium-locale/locale $WINEPREFIX/drive_c/garlium/lib/
-cp garlium-icons/icons_rc.py $WINEPREFIX/drive_c/garlium/gui/qt/
+#cp -r garlium-locale/locale $WINEPREFIX/drive_c/garlium/lib/
+#cp garlium-icons/icons_rc.py $WINEPREFIX/drive_c/garlium/gui/qt/
 
 # Install frozen dependencies
 $PYTHON -m pip install -r ../../requirements.txt

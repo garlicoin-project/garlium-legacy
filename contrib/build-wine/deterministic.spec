@@ -11,7 +11,7 @@ else:
     raise BaseException('no name')
 
 
-home = '../../'
+home = 'C:\\garlium\\'
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
 hiddenimports = []
