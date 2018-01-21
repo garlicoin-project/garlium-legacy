@@ -427,14 +427,10 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'explorer.garlicoin.net': ('http://explorer.garlicoin.net',
+    'explorer.garlicoin.io': ('http://explorer.garlicoin.io',
                         {'tx': 'tx', 'addr': 'address'}),
-    'Blockr.io': ('https://ltc.blockr.io',
-                        {'tx': 'tx/info', 'addr': 'address/info'}),
-    'BlockCypher.com': ('https://live.blockcypher.com/ltc',
-                        {'tx': 'tx', 'addr': 'address'}),
-    'SoChain': ('https://chain.so',
-                        {'tx': 'tx/LTC', 'addr': 'address/LTC'}),
+    'Bakery': ('https://explorer.grlc-bakery.fun',
+                        {'tx': 'tx/', 'addr': 'address'}),
     'system default': ('blockchain:',
                         {'tx': 'tx', 'addr': 'address'}),
 }
