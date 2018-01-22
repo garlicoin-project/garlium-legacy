@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME_ROOT=garlium
+NAME_ROOT=Garlium
 PYTHON_VERSION=3.5.4
 
 # These settings probably don't need any change
@@ -67,7 +67,7 @@ cd ..
 rm -rf dist/
 
 # build standalone and portable versions
-wine "C:/python$PYTHON_VERSION/scripts/pyinstaller.exe" --noconfirm --ascii --name $NAME_ROOT-$VERSION -w deterministic.spec
+wine "C:/python$PYTHON_VERSION/scripts/pyinstaller.exe" --noconfirm --ascii --name $NAME_ROOT -w deterministic.spec
 
 # set timestamps in dist, in order to make the installer reproducible
 pushd dist
@@ -76,10 +76,28 @@ popd
 
 # build NSIS installer
 # $VERSION could be passed to the electrum.nsi script, but this would require some rewriting in the script iself.
-wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION electrum.nsi
+#wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION electrum.nsi
+
+# build Inno Setup
+
+pushd tmp
+wget http://constexpr.org/innoextract/files/innoextract-1.6-windows.zip
+unzip innoextract-1.6-windows.zip
+
+wget http://files.jrsoftware.org/is/5/innosetup-5.5.9-unicode.exe
+wine innoextract.exe innosetup-5.5.9-unicode.exe
+popd
+
+(echo "#define MyAppVersion \"$VERSION\""; cat garlium.iss) > garlium-versioned-tmp.iss
+wine tmp/app/ISCC.exe garlium-versioned-tmp.iss
 
 cd dist
-mv garlium-setup.exe $NAME_ROOT-$VERSION-setup.exe
+cp $NAME_ROOT-setup.exe $NAME_ROOT-$VERSION-setup.exe
+cp $NAME_ROOT.exe $NAME_ROOT-$VERSION.exe
+cp $NAME_ROOT-portable.exe $NAME_ROOT-$VERSION-portable.exe
+
+zip -r9 $NAME_ROOT.zip garlium/
+cp $NAME_ROOT.zip $NAME_ROOT-$VERSIOn.exe
 cd ..
 
 echo "Done."

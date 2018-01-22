@@ -113,7 +113,7 @@ cp $WINEPREFIX/drive_c/python$PYTHON_VERSION/Lib/site-packages/PyQt5/Qt/bin/* $W
 
 # Install MinGW
 wget http://downloads.sourceforge.net/project/mingw/Installer/mingw-get/mingw-get-0.6.2-beta-20131004-1/mingw-get-0.6.2-mingw32-beta-20131004-1-bin.zip
-unzip -xvzf mingw-get-0.6.2-mingw32-beta-20131004-1-bin.zip
+unzip mingw-get-0.6.2-mingw32-beta-20131004-1-bin.zip
 
 #echo "add c:\MinGW\bin to PATH using regedit"
 #echo "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment"
