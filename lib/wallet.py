@@ -977,8 +977,8 @@ class Abstract_Wallet(PrintError):
     def start_threads(self, network):
         self.network = network
         if self.network is not None:
-            self.prepare_for_verifier()
             self.verifier = SPV(self.network, self)
+            self.prepare_for_verifier()
             self.synchronizer = Synchronizer(self, network)
             network.add_jobs([self.verifier, self.synchronizer])
         else:

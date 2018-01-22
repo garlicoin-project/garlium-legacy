@@ -1,0 +1,143 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    </head>
+
+    <body>
+        <div class="container text-center mt-5">
+            <h1 class="display-1">Garlium</h1>
+            <p class="lead">A lightweight Garlicoin desktop wallet</p>
+
+            <p>Garlium is a lightweight desktop wallet for Garlicoin, based on <a href="https://electrum.org/">Electrum</a>. By deterministically generating your wallet keys, you can save your wallet by writing a simple 12-word phrase down. You can load your wallet at any time by simply typing the 12-word phrase back in, on any computer, anywhere.</p>
+       
+            <img src="screenshot.png" class="img-fluid mt-3" style="box-shadow: 0 0 12px rgba(0,0,0,.2);"><br />
+
+            <a href="http://f.ske.wtf/garlium/Garlium-setup-new.exe" type="button" class="btn btn-primary btn-lg pl-5 pr-5 mt-3">Download for Windows<br><small>(for Mac and Linux, see below)</small></a><br /><br />
+
+            <small class="text-muted">Like what you see? Donate to the developer to keep this project alive: <code>GNPQzRMXqrkZqBtsT9PkQZn3YrHVBhdhXR</code></small>
+        </div>
+
+        <div class="container mt-5">
+            <h1>Source install</h5>
+            <h5 class="mb-2 text-muted">Mac and Linux</h6>
+            <p>
+                <ol>
+                    <li>Install requirements:
+                        <ul>
+                            <li>Ubuntu/Debian: <pre>sudo apt install python3 python3-pip git</pre></li>
+                            <li>Fedora (comes with Python 3 preinstalled): <pre>sudo dnf install git</pre></li>
+                            <li>Arch: <pre>sudo pacman -S python python-pip git</pre></li>
+                            <li>OS X: Download <a href="https://python.org/downloads">Python 3 here</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        Clone repository:
+                        <pre>git clone https://github.com/xSke/Garlium
+    cd Garlium</pre>
+                    </li>
+                    <li>
+                        Install Garlium + dependencies:
+                        <pre>python3 setup.py install</pre>
+                    </li>
+                    <li>
+                        Run Garlium:
+                        <pre>python3 ./garlium</pre>
+                    </li>
+                </ol>
+            </p>
+        </div>
+
+        <div class="container mt-5">
+            <h1>FAQ</h1>
+
+            <dl>
+                <dt>My receiving address has changed. Why is this?</dt>
+                <dd>For privacy reasons, Garlium assigns you a new default receive address when the old one has been used. <b>Your old addresses will still work</b>, and you can see the entire address list by going to <kbd>View -> Show Addresses</kbd></dt>
+
+                <dt>Do I need to keep Garlium open to receive coins?</dt>
+                <dd>No. Garlium will automatically reconnect to the network and catch up with transaction history when you open it. Shutting it down is safe, even for extended periods of time.</dd>
+
+                <dt>Is my wallet stored on an external server?</dt>
+                <dd>No. Garlium uses server nodes to ensure a fast synchronization, but your actual wallet and private key is only stored on your computer, and is <u>never</u> sent to the internet.</dd>
+
+                <dt>How do I import a paper wallet into Garlium?</dt>
+                <dd>
+                    <ol>
+                        <li>Create a new wallet. You can do this from the setup wizard, or go to <kbd>File -> New/Restore</kbd>.</li>
+                        <li>When asked which kind of wallet to create, select "Import Garlicoin addresses or private keys".</li>
+                        <li>
+                            <ul class="list-unstyled">
+                                <li>To create a watching-only wallet, paste in the <b>address</b> of your paper wallet.</li>
+                                <li>To create a full wallet, paste in the <b>private key</b> of your paper wallet.</li>
+                            </ul>
+                        </li>
+                    </ol>
+
+                    <dt>What's the difference between a watching-only wallet and a full wallet?</dt>
+                    <dd>A watching-only wallet only stores your wallet's public key - its address. This means that you cannot spend the coins in the wallet, merely look at them. This is a lot more secure, because even if your computer gets compromised, an attacker will not gain access to your coins. On the other hand, a full wallet stores your address's private key as well. This allows you to send your coins, but is less secure.</dd>
+                </dd>
+
+                <dt>How do I import a CLI (garlicoind/garlicoin-cli) wallet into Garlium?</dd>
+                <dd>Run the command <code>garlicoin-cli dumpprivkey &lt;YOURADDRESS&gt;</code>. This will provide you with your address's private key. See above (regarding paper wallets) for instructions on how to import that private key into Garlium.</dt>
+
+                <dt>How do I import a breadbox.xyz wallet into Garlium?</dt>
+                <dd>Because Breadbox doesn't allow you to export your private key, that is not possible. You must transfer your coins directly to your Garlium receive address.</dd>
+            </dl>
+        </div>
+
+        <div class="container mt-5">
+            <h1>Troubleshooting</h1>
+
+            <dl>
+                <dt>Garlium is being detected as a virus!</dt>
+                <dd>Relax. Garlium is completely safe. Something causes some major AVs to flag Garlium as a trojan, for unknown reasons.</dt>
+            
+                <dt>Garlium says "Not connected" in the bottom left</dt>
+                <dd>The server nodes may be overloaded. Try connecting to another server (under <kbd>Tools -> Network -> Servers</kbd>), restarting Garlium entirely, or just wait a while.</dt>
+
+                <dt>Garlium says "Synchronizing..." in the bottom left for an extended period of time</dt>
+                <dd>The server nodes may be overloaded. Try connecting to another server (under <kbd>Tools -> Network -> Servers</kbd>), restarting Garlium entirely, or just wait a while.</dt>
+
+                <dt>Garlium says "Server is lagging (30xxx blocks)"</dt>
+                <dd>It's trying to connect to the testnet blockchain, somehow. Delete %AppData%/Garlium/blockchain_headers.</dd>
+            </dl>
+
+            <h2>Nodes</h2>
+            <p>If you're having connection issues, perhaps connect to another server node. You can add a node by going to <kbd>Tools -> Network -> Servers</kbd>, unchecking "Select server automatically", and inserting the details in the two text boxes.</p>
+            
+            <p>Here is a full list of known nodes:</p>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Server</th>
+                        <th scope="col">Port</th>
+                        <th scope="col">Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ske.wtf</td>
+                        <td>50004</td>
+                        <td>@Ske#6201</td>
+                    </tr>
+                    <tr>
+                        <td>172.93.54.31</td>
+                        <td>50002</td>
+                        <td>@DBN#1688</td>
+                    </tr>
+                    <tr>
+                        <td>84.245.14.110</td>
+                        <td>50002</td>
+                        <td>@Bonobo#8875</td>
+                    </tr>
+                    <tr>
+                        <td>mhamburger.net</td>
+                        <td>50002</td>
+                        <td>@mark3748#1645</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>
