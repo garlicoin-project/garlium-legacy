@@ -100,8 +100,13 @@
                 <dd>The server nodes may be overloaded. Try connecting to another server (under <kbd>Tools -> Network -> Servers</kbd>), restarting Garlium entirely, or just wait a while.</dt>
 
                 <dt>Garlium says "Server is lagging (30xxx blocks)"</dt>
-                <dd>It's trying to connect to the testnet blockchain, somehow. Delete %AppData%/Garlium/blockchain_headers.</dd>
+                <dd>It's trying to connect to the testnet blockchain, somehow. Delete %AppData%/Garlium/blockchain_headers and restart.</dd>
+
+                <dt>"The program can't start because api-ms-win-crt-stdio-l1-1-0.dll is missing from your computer. Try reinstalling the program to fix this problem."</dt>
+                <dd>Install <a href="https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows">this Windows update</a>.</dd>
             </dl>
+
+            <p>In fact, deleting %AppData%/Garlium/blockchain_headers and restarting solves a lot of problems. If your issue isn't listed here, perhaps try it?</p>
 
             <h2>Nodes</h2>
             <p>If you're having connection issues, perhaps connect to another server node. You can add a node by going to <kbd>Tools -> Network -> Servers</kbd>, unchecking "Select server automatically", and inserting the details in the two text boxes.</p>
@@ -136,6 +141,11 @@
                         <td>mhamburger.net</td>
                         <td>50002</td>
                         <td>@mark3748#1645</td>
+                    </tr>
+                    <tr>
+                        <td>garlium.kenzierocks.me</td>
+                        <td>50002</td>
+                        <td>@octylFractal#1861</td>
                     </tr>
                 </tbody>
             </table>
