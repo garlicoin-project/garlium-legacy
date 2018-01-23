@@ -104,8 +104,16 @@
 
                 <dt>"The program can't start because api-ms-win-crt-stdio-l1-1-0.dll is missing from your computer. Try reinstalling the program to fix this problem."</dt>
                 <dd>Install <a href="https://support.microsoft.com/en-us/help/2999226/update-for-universal-c-runtime-in-windows">this Windows update</a>.</dd>
+
+                <dt>My transactions are too large / require a huge fee!</dt>
+                <dt>(or) I get "the transaction was rejected by network rules.\n\n64: dust (or tx-size)" when sending coins</dt>
+                <dd>
+                    <p>If you have a large amount of small incoming transactions in your wallet, your money is split among lots of small transaction inputs. Each input takes up some space in the new transaction, and as such your transaction will become very large. Larger transactions mean larger fees, and at some point the network will downright refuse to process your transaction.</p>
+                    <p>To remedy this issue, you must consolidate your inputs. This can be done by going to <kbd>View -> Show Coins</kbd>. Select a number of transactions by dragging (or holding CTRL), right click, and click "Spend". You can then adjust the amount. Either send the coins to your preferred destination address, or to your own Receive address, which will "merge" your inputs into transactions with larger value but smaller blockchain size.</p>
+                </dd>
             </dl>
 
+            <hr>
             <p>In fact, deleting %AppData%/Garlium/blockchain_headers and restarting solves a lot of problems. If your issue isn't listed here, perhaps try it?</p>
 
             <h2>Nodes</h2>
