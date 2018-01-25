@@ -1,0 +1,132 @@
+
+
+version: b{build}-{branch}
+
+clone_folder: C:\garlium
+
+build_script:
+
+- cmd: >-
+
+    cd C:\garlium
+
+
+
+    C:\Python35\Scripts\pip install -r contrib/requirements.txt
+
+
+
+    C:\Python35\Scripts\pip install PyQt5
+
+
+
+    C:\Python35\Scripts\pip install pypiwin32
+
+
+
+    C:\Python35\Scripts\pip install setuptools
+
+
+
+    C:\Python35\Scripts\pip install cython
+
+
+
+    C:\Python35\Scripts\pip install trezor==0.7.16
+
+
+
+    C:\Python35\Scripts\pip install keepkey==4.0.0
+
+
+
+    C:\Python35\Scripts\pip install btchip-python==0.1.23
+
+
+
+
+
+    git clone -b fix_2952 https://github.com/ecdsa/pyinstaller.git
+
+
+
+    cd pyinstaller
+
+
+
+    git pull
+
+
+
+    git checkout fix_2952
+
+
+
+    C:\Python35\python setup.py install
+
+
+
+    cd ..
+
+
+
+
+
+    C:\Python35\python setup.py install
+
+
+
+
+
+    cd contrib
+
+
+
+    cd build-wine
+
+
+
+    C:\Python35\Scripts\pyinstaller --noconfirm --ascii --name Garlium -w deterministic.spec
+
+
+
+
+
+    echo #define MyAppVersion "%APPVEYOR_REPO_COMMIT%" >> garlium-versioned.iss
+
+
+
+    type garlium.iss >> garlium-versioned.iss
+
+
+
+    "C:\Program Files (x86)\Inno Setup 5\ISCC" garlium-versioned.iss
+
+
+
+
+
+    copy dist\Garlium-setup.exe ..\..
+
+
+
+    cd dist
+
+
+
+    cd garlium
+
+
+
+    7z a -r ../../../../Garlium.zip *
+
+artifacts:
+
+- path: Garlium-setup.exe
+
+  name: Setup
+
+- path: Garlium.zip
+
+  name: Archive
+

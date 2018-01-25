@@ -5,6 +5,10 @@
 
     <body>
         <div class="container text-center mt-5">
+            <div class="alert alert-warning" role="alert">
+                If you are having issues with slow transaction signing or errors when sending your coins, see the Troubleshooting section about merging UTXOs.
+            </div>
+
             <h1 class="display-1">Garlium</h1>
             <p class="lead">A lightweight Garlicoin desktop wallet</p>
 
@@ -12,8 +16,8 @@
        
             <img src="screenshot.png" class="img-fluid mt-3" style="box-shadow: 0 0 12px rgba(0,0,0,.2);"><br />
 
-            <a href="http://f.ske.wtf/garlium/Garlium-setup.exe" type="button" class="btn btn-primary btn-lg pl-5 pr-5 mt-3">Installer for Windows<br><small>(for Mac and Linux, see below)</small></a><br />
-            <a href="http://f.ske.wtf/garlium/Garlium.zip">Windows binaries (.zip)</a><br /><br />
+            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium-setup.exe?branch=master" type="button" class="btn btn-primary btn-lg pl-5 pr-5 mt-3">Installer for Windows<br><small>(for Mac and Linux, see below)</small></a><br />
+            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium.zip?branch=master">Windows binaries (.zip)</a><br /><br />
 
             <small class="text-muted">Like what you see? Donate to the developer to keep this project alive: <code>GNPQzRMXqrkZqBtsT9PkQZn3YrHVBhdhXR</code></small>
         </div>
@@ -111,14 +115,16 @@ cd Garlium</pre>
 
                 <dt>My transactions are too large / require a huge fee!</dt>
                 <dt>(or) I get "the transaction was rejected by network rules.\n\n64: dust (or tx-size)" when sending coins</dt>
+                <dt>(or) Garlium takes <em>forever</em> to sign my transactions</dt>
                 <dd>
-                    <p>If you have a large amount of small incoming transactions in your wallet, your money is split among lots of small transaction inputs. Each input takes up some space in the new transaction, and as such your transaction will become very large. Larger transactions mean larger fees, and at some point the network will downright refuse to process your transaction.</p>
-                    <p>To remedy this issue, you must consolidate your inputs. This can be done by going to <kbd>View -> Show Coins</kbd>. Select a number of transactions by dragging (or holding CTRL), right click, and click "Spend". You can then adjust the amount. Either send the coins to your preferred destination address, or to your own Receive address, which will "merge" your inputs into transactions with larger value but smaller blockchain size.</p>
+                    <p>If you have a large amount of small incoming transactions in your wallet (eg. from pool mining), your money is split among lots of UTXOs (or unspent transaction outputs). Each UTXO takes up some space in the new transaction, and as such your transaction will become very large. Larger transactions mean larger fees, and at some point the network will downright refuse to process your transaction.</p>
+                    <p>To fix this issue, you can either hand-pick UTXOs to send, so you can control how many you use, or send a bunch of UTXOs to yourself, essentially "merging" them into a single UTXO.</p>
+                    <p>You can do this by going to <kbd>View -> Show Coins</kbd>. Every "coin" you see there is a UTXO. Select as many as you need to send (by dragging or holding Ctrl), right click, and press "Spend". Now, select how much you want to spend, and send your money either to yourself (to "merge" UTXOs), or to someone else (they'll receive them as a normal transaction).</p>
                 </dd>
             </dl>
 
             <hr>
-            <p>In fact, deleting %AppData%/Garlium/blockchain_headers and restarting solves a lot of problems. If your issue isn't listed here, perhaps try it?</p>
+            <p><strong>PS</strong>: Deleting %AppData%/Garlium/blockchain_headers and restarting solves a lot of problems. If your issue isn't listed here, perhaps try that?</p>
 
             <h2>Nodes</h2>
             <p>If you're having connection issues, perhaps connect to another server node. You can add a node by going to <kbd>Tools -> Network -> Servers</kbd>, unchecking "Select server automatically", and inserting the details in the two text boxes.</p>
