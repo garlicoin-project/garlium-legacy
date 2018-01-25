@@ -1,8 +1,12 @@
-
-
 version: b{build}-{branch}
 
 clone_folder: C:\garlium
+
+environment:
+
+  PYTHONHASHSEED: 22
+
+  PYTHONDONTWRITEBYTECODE: 1
 
 build_script:
 
@@ -16,7 +20,7 @@ build_script:
 
 
 
-    C:\Python35\Scripts\pip install PyQt5
+    C:\Python35\Scripts\pip install PyQt5==5.9.2
 
 
 
@@ -41,6 +45,20 @@ build_script:
 
 
     C:\Python35\Scripts\pip install btchip-python==0.1.23
+
+
+
+    C:\Python35\Scripts\pip install pycryptodomex
+
+
+
+    C:\Python35\Scripts\pip install win_inet_pton
+
+
+
+
+
+    copy C:\Python35\Lib\site-packages\PyQt5\Qt\bin\* C:\Python35
 
 
 
@@ -129,4 +147,3 @@ artifacts:
 - path: Garlium.zip
 
   name: Archive
-
