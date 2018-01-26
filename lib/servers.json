@@ -34,5 +34,29 @@
         "s": "50002",
         "t": "50001",
         "version": "1.1"
+    },
+    "electrum.grlc-bakery.fun": {
+        "pruning": "-",
+        "s": "50002",
+        "t": "50001",
+        "version": "1.1"
+    },
+    "garlium.grlc-bakery.fun": {
+        "pruning": "-",
+        "s": "50002",
+        "t": "50001",
+        "version": "1.1"
+    },
+    "electrum.garli.co.in": {
+        "pruning": "-",
+        "s": "50002",
+        "t": "50001",
+        "version": "1.1"
+    },
+    "garlium.garli.co.in": {
+        "pruning": "-",
+        "s": "50002",
+        "t": "50001",
+        "version": "1.1"
     }
 }
