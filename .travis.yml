@@ -1,16 +1,26 @@
 sudo: false
 install:
   - pip install -r contrib/requirements.txt
+  - pip install pyinstaller
   - pip install PyQt5
+  - pip install trezor==0.7.16
+  - pip install keepkey==4.0.0
+  - pip install btchip-python==0.1.23
+  - pip install pycryptodomex
+
 
 matrix:
   include:
     - language: generic
       os: osx
       before_install:
+        - export LDFLAGS="-L$(brew --prefix openssl)/lib"
+        - export CFLAGS="-I$(brew --prefix openssl)/include"
         - brew update
         - brew install python3
         - virtualenv env -p python3
         - source env/bin/activate
       script:
+        - export LDFLAGS="-L$(brew --prefix openssl)/lib"
+        - export CFLAGS="-I$(brew --prefix openssl)/include"
         - ./contrib/make_osx

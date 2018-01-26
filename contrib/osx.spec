@@ -10,7 +10,7 @@ for i, x in enumerate(sys.argv):
 else:
     raise BaseException('no version')
 
-home = '/Users/pooler/garlium/'
+home = '/Users/travis/build/xSke/garlium/'
 block_cipher=None
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
@@ -27,7 +27,7 @@ datas = [
     (home+'lib/servers_testnet.json', 'electrum_ltc'),
     (home+'lib/checkpoints_testnet.json', 'electrum_ltc'),
     (home+'lib/wordlist/english.txt', 'electrum_ltc/wordlist'),
-    (home+'lib/locale', 'electrum_ltc/locale'),
+#    (home+'lib/locale', 'electrum_ltc/locale'),
     (home+'plugins', 'electrum_ltc_plugins'),
 ]
 datas += collect_data_files('trezorlib')
