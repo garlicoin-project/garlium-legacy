@@ -10,7 +10,7 @@ for i, x in enumerate(sys.argv):
 else:
     raise BaseException('no version')
 
-home = '/Users/pooler/garlium/'
+home = '/Users/travis/build/xSke/garlium/'
 block_cipher=None
 
 # see https://github.com/pyinstaller/pyinstaller/issues/2005
