@@ -1,5 +1,6 @@
 sudo: false
 install:
+  - source env/bin/activate
   - pip install -r contrib/requirements.txt
   - pip install pyinstaller
   - pip install PyQt5
@@ -21,9 +22,17 @@ matrix:
         - virtualenv env -p python3
         - source env/bin/activate
       script:
+        - source env/bin/activate
         - export LDFLAGS="-L$(brew --prefix openssl)/lib"
         - export CFLAGS="-I$(brew --prefix openssl)/include"
-        - ./contrib/make_osx
+        - rm -rf dist
+        - export PYTHONHASHSEED=22
+        - pyinstaller --noconfirm --ascii --name b$TRAVIS_BUILD_NUMBER-$TRAVIS_BRANCH contrib/osx.spec
+        - hdiutil create -fs HFS+ -volname "Garlium" -srcfolder dist/Garlium.app dist/Garlium.dmg
+
+branches:
+  except:
+  - osx-builds
 
 deploy:
   provider: pages
