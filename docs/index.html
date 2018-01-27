@@ -16,8 +16,8 @@
        
             <img src="screenshot.png" class="img-fluid mt-3" style="box-shadow: 0 0 12px rgba(0,0,0,.2);"><br />
 
-            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium-setup.exe?branch=master" type="button" class="btn btn-primary btn-lg pl-5 pr-5 mt-3">Installer for Windows<br><small>(for Mac and Linux, see below)</small></a><br />
-            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium.zip?branch=master">Windows binaries (.zip)</a><br /><br />
+            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium-setup.exe?branch=master&pr=false" type="button" class="btn btn-primary btn-lg pl-5 pr-5 mt-3">Installer for Windows<br><small>(for Mac and Linux, see below)</small></a><br />
+            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium.zip?branch=master&pr=false">Windows binaries (.zip)</a><br /><br />
 
             <small class="text-muted">Like what you see? Donate to the developer to keep this project alive: <code>GNPQzRMXqrkZqBtsT9PkQZn3YrHVBhdhXR</code></small>
         </div>
@@ -119,7 +119,7 @@ cd Garlium</pre>
                 <dd>
                     <p>If you have a large amount of small incoming transactions in your wallet (eg. from pool mining), your money is split among lots of UTXOs (or unspent transaction outputs). Each UTXO takes up some space in the new transaction, and as such your transaction will become very large. Larger transactions mean larger fees, and at some point the network will downright refuse to process your transaction. It's like paying with a thousand pennies instead of a $10 bill.</p>
                     <p>To fix this issue, you can either hand-pick UTXOs to send, so you can control how many you use, or send a bunch of UTXOs to yourself, essentially "merging" them into a single UTXO.</p>
-                    <p>You can do this by going to <kbd>View -> Show Coins</kbd>. Every "coin" you see there is a UTXO. Select as many as you need to send (by dragging or holding Ctrl), right click, and press "Spend". Now, select how much you want to spend, and send your money either to yourself (to "merge" UTXOs), or to someone else (they'll receive them as a normal transaction).</p>
+                    <p>You can do this by going to <kbd>View -> Show Coins</kbd>. Every "coin" you see there is a UTXO. Select as many as you need to send (don't select more than about 250, though), right click, and press "Spend". Now, select how much you want to spend, and send your money either to yourself (to "merge" UTXOs), or to someone else (they'll receive them as a normal transaction).</p>
                 </dd>
             </dl>
 
