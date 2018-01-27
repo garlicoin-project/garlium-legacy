@@ -40,5 +40,17 @@
         "s": "50002",
         "t": "50001",
         "version": "1.1"
+    },
+    "garlium.garlicpool.org": {
+        "pruning": "-",
+        "s": "50002",
+        "t": "50001",
+        "version": "1.1"
+    },
+    "garlium.rshaw.space": {
+        "pruning": "-",
+        "s": "50002",
+        "t": "50001",
+        "version": "1.1"
     }
 }
