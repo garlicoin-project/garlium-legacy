@@ -71,13 +71,13 @@ exe = EXE(pyz,
           debug=False,
           strip=False,
           upx=True,
-          icon=home+'electrum.icns',
+          icon=home+'garlium.icns',
           console=False)
 
 app = BUNDLE(exe,
              version = VERSION,
              name='Garlium.app',
-             icon=home+'electrum.icns',
+             icon=home+'garlium.icns',
              bundle_identifier=None,
              info_plist = {
                  'NSHighResolutionCapable':'True'

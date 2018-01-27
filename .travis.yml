@@ -24,3 +24,13 @@ matrix:
         - export LDFLAGS="-L$(brew --prefix openssl)/lib"
         - export CFLAGS="-I$(brew --prefix openssl)/include"
         - ./contrib/make_osx
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard, marked secure
+  keep-history: false
+  local-dir: dist/
+  target-branch: osx-builds
+  on:
+    branch: master
