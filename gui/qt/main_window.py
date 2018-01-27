@@ -89,7 +89,6 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
     payment_request_ok_signal = pyqtSignal()
     payment_request_error_signal = pyqtSignal()
-    notify_transactions_signal = pyqtSignal()
     new_fx_quotes_signal = pyqtSignal()
     new_fx_history_signal = pyqtSignal()
     network_signal = pyqtSignal(str, object)
@@ -174,7 +173,6 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         self.payment_request_ok_signal.connect(self.payment_request_ok)
         self.payment_request_error_signal.connect(self.payment_request_error)
-        self.notify_transactions_signal.connect(self.notify_transactions)
         self.history_list.setFocus(True)
 
         # network callbacks
@@ -199,6 +197,11 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.load_wallet(wallet)
         self.connect_slots(gui_object.timer)
         self.fetch_alias()
+
+        self.update_notifications_timer = QTimer()
+        self.update_notifications_timer.setInterval(10000)
+        self.update_notifications_timer.timeout.connect(self.notify_transactions)
+        self.update_notifications_timer.start()
 
     def on_history(self, b):
         self.new_fx_history_signal.emit()
@@ -286,7 +289,8 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
 
         elif event == 'new_transaction':
             self.tx_notifications.append(args[0])
-            self.notify_transactions_signal.emit()
+            self.update_status()
+            # self.notify_transactions_signal.emit()
         elif event in ['status', 'banner', 'verified', 'fee']:
             # Handle in GUI thread
             self.network_signal.emit(event, args)
@@ -549,13 +553,15 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
         self.show_message(msg, title="Garlium - " + _("Reporting Bugs"))
 
     def notify_transactions(self):
-        if not self.network or not self.network.is_connected():
+        if not self.network or not self.network.is_connected() or not self.wallet.up_to_date:
             return
-        self.print_error("Notifying GUI")
+
         if len(self.tx_notifications) > 0:
+            self.print_error("Notifying GUI")
+
             # Combine the transactions if there are more then three
             tx_amount = len(self.tx_notifications)
-            if(tx_amount >= 3):
+            if(tx_amount >= 2):
                 total_amount = 0
                 for tx in self.tx_notifications:
                     is_relevant, is_mine, v, fee = self.wallet.get_wallet_delta(tx)
@@ -695,7 +701,7 @@ class ElectrumWindow(QMainWindow, MessageBoxMixin, PrintError):
             # until we get a headers subscription request response.
             # Display the synchronizing message in that case.
             if not self.wallet.up_to_date or server_height == 0:
-                text = _("Synchronizing...")
+                text = _("Synchronizing... (%d tx behind)" % len(self.wallet.synchronizer.requested_tx))
                 icon = QIcon(":icons/status_waiting.png")
             elif server_lag > 1:
                 text = _("Server is lagging (%d blocks)"%server_lag)
