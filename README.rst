@@ -9,6 +9,9 @@ Garlium - Lightweight Garlicoin client
   Language: Python
   Homepage: https://github.com/xSke/garlium
 
+Donation address: `GNPQzRMXqrkZqBtsT9PkQZn3YrHVBhdhXR`
+
+Build artifacts: https://ci.appveyor.com/project/xSke/garlium/build/artifacts
 
 Getting started
 ===============
