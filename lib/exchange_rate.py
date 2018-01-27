@@ -237,6 +237,10 @@ class WEX(ExchangeBase):
                 'RUB': Decimal(json_rub['ltc_rur']['last']),
                 'USD': Decimal(json_usd['ltc_usd']['last'])}
 
+class CoinMarketCap(ExchangeBase):
+    def get_rates(self, ccy):
+        json = self.get_json("api.coinmarketcap.com", "/v1/ticker/garlicoin/?convert=" + ccy)
+        return {ccy: Decimal(json[0]["price_" + ccy.lower()])}
 
 def dictinvert(d):
     inv = {}
