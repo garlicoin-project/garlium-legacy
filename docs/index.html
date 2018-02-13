@@ -13,11 +13,11 @@
             <p class="lead">A lightweight Garlicoin desktop wallet</p>
 
             <p>Garlium is a lightweight desktop wallet for Garlicoin, based on <a href="https://electrum.org/">Electrum</a>. By deterministically generating your wallet keys, you can save your wallet by writing a simple 12-word phrase down. You can load your wallet at any time by simply typing the 12-word phrase back in, on any computer, anywhere.</p>
-       
+
             <img src="screenshot.png" class="img-fluid mt-3" style="box-shadow: 0 0 12px rgba(0,0,0,.2);"><br />
 
-            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium-setup.exe?branch=master&pr=false" type="button" class="btn btn-primary btn-lg pl-5 pr-5 mt-3">Installer for Windows<br><small>(for Mac and Linux, see below)</small></a><br />
-            <a href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium.zip?branch=master&pr=false">Windows binaries (.zip)</a><br /><br />
+            <a id="windows-installer-link" href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium-setup.exe?branch=master&pr=false" type="button" class="btn btn-primary btn-lg pl-5 pr-5 mt-3">Installer for Windows<br><small><small id="windows-installer-details"></small></small></a><br />
+            <a id="windows-zip-link" href="https://ci.appveyor.com/api/projects/xSke/garlium/artifacts/Garlium.zip?branch=master&pr=false">Windows binaries (.zip)</a><br /><br />
 
             <small class="text-muted">Like what you see? Donate to the developer to keep this project alive: <code>GNPQzRMXqrkZqBtsT9PkQZn3YrHVBhdhXR</code></small>
         </div>
@@ -104,7 +104,7 @@ cd Garlium</pre>
             <dl>
                 <dt>Garlium is being detected as a virus!</dt>
                 <dd>Relax. Garlium is completely safe. Something causes some major AVs to flag Garlium as a trojan, for unknown reasons.</dt>
-            
+
                 <dt>Garlium says "Not connected" in the bottom left</dt>
                 <dd>The server nodes may be overloaded. Try connecting to another server (under <kbd>Tools -> Network -> Servers</kbd>), restarting Garlium entirely, or just wait a while.</dt>
 
@@ -132,7 +132,7 @@ cd Garlium</pre>
 
             <h2>Nodes</h2>
             <p>If you're having connection issues, perhaps connect to another server node. You can add a node by going to <kbd>Tools -> Network -> Servers</kbd>, unchecking "Select server automatically", and inserting the details in the two text boxes.</p>
-            
+
             <p>Here is a full list of known nodes:</p>
 
             <table class="table">
@@ -212,5 +212,26 @@ cd Garlium</pre>
                 </tbody>
             </table>
         </div>
+
+        <script>
+            var req = new XMLHttpRequest();
+            req.open("GET", "https://ci.appveyor.com/api/projects/xSke/Garlium/branch/master", true);
+            req.onload = function() {
+                if (req.status >= 200 && req.status < 300) {
+                    var data = JSON.parse(req.responseText);
+                    var buildTime = new Date(data.build.finished);
+                    var elem = document.getElementById("windows-installer-details");
+                    elem.innerHTML = buildTime.toLocaleString(undefined, {
+                        hour12: false,
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    }) + " - " + data.build.commitId.substr(0, 8);
+                }
+            };
+            req.send();
+        </script>
     </body>
 </html>
