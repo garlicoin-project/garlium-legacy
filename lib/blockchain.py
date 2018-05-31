@@ -22,6 +22,7 @@
 # SOFTWARE.
 import os
 import threading
+import allium_hash
 
 from . import util
 from . import bitcoin
@@ -29,20 +30,19 @@ from . import constants
 from .bitcoin import *
 
 def get_n_factor(timestamp):
-    return 9
+    return 10
     #return (timestamp - constants.net.ADAPTIVE_N_EPOCH) // constants.net.ADAPTIVE_N_INTERVAL + constants.net.ADAPTIVE_N_INITIAL
 
 try:
     import scrypt
-
-    getPoWHash = lambda x, t: scrypt.hash(x, x, N=(2 << get_n_factor(t)), r=1, p=1, buflen=32)
+    getScryptPow = lambda x, t: scrypt.hash(x, x, N=(2 << get_n_factor(t)), r=1, p=1, buflen=32)
 except ImportError:
     util.print_msg("Warning: package scrypt not available; synchronization could be very slow")
 
     from .scrypt import scrypt_n_1_1_80
-    getPoWHash = lambda x, t: scrypt_n_1_1_80(x, (2 << get_n_factor(t)))
+    getScryptPow = lambda x, t: scrypt_n_1_1_80(x, (2 << get_n_factor(t)))
 
-MAX_TARGET = 0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+MAX_TARGET = 0x00000FFFFF000000000000000000000000000000000000000000000000000000
 
 def serialize_header(res):
     s = int_to_hex(res.get('version'), 4) \
@@ -77,7 +77,10 @@ def hash_header(header):
     return hash_encode(Hash(bfh(serialize_header(header))))
 
 def pow_hash_header(header):
-    return hash_encode(getPoWHash(bfh(serialize_header(header)), header["timestamp"]))
+    if header.get('block_height') <= 58670:
+        return hash_encode(getScryptPow(bfh(serialize_header(header)), header["timestamp"]))
+    else:
+        return hash_encode(allium_hash.getPoWHash(bfh(serialize_header(header))))
 
 
 blockchains = {}
@@ -185,10 +188,12 @@ class Blockchain(util.PrintError):
     def verify_chunk(self, index, data):
         num = len(data) // 80
         prev_hash = self.get_hash(index * 2016 - 1)
-        target = self.get_target(index)
+        headers = {}
         for i in range(num):
             raw_header = data[i*80:(i+1) * 80]
             header = deserialize_header(raw_header, index*2016 + i)
+            headers[header.get('block_height')] = header
+            target = self.get_target(index*2016 + i, headers)
             self.verify_header(header, prev_hash, target)
             prev_hash = hash_header(header)
 
@@ -321,14 +326,19 @@ class Blockchain(util.PrintError):
         target = (a) * pow(2, 8 * (bits//MM - 3))
         return target
 
-    def get_target(self, height):
+    def get_target(self, height, chain=None):
         # current difficulty formula, dash - DarkGravity v3, written by Evan Duffield - evan@dash.org 
         # https://github.com/wakiyamap/electrum-mona/blob/master/lib/blockchain.py#L334
         if constants.net.TESTNET:
             return 0
+        last = chain.get(height - 1)
+        if last is None:
+            last = self.read_header(height - 1)
 
-        last = self.read_header(height - 1)
+        # print(chain)
 
+        # last = self.read_header(height - 1)
+        # print("%s %s" % (last, height))
         # params
         BlockLastSolved = last
         BlockReading = last
@@ -342,8 +352,10 @@ class Blockchain(util.PrintError):
         bnNum = 0
 
         # DGWv3 PastBlocks = 45 Because checkpoint don't have preblock data.
+        if height == 0:
+            return 0x00000FFFF0000000000000000000000000000000000000000000000000000000
         if height < PastBlocks:
-            return MAX_TARGET
+            return 0x00000FFFFF000000000000000000000000000000000000000000000000000000
         #thanks watanabe!! http://askmona.org/5288#res_61
         if BlockLastSolved is None:
             return MAX_TARGET
@@ -358,12 +370,14 @@ class Blockchain(util.PrintError):
             # PastDifficultyAveragePrev = PastDifficultyAverage
 
             if CountBlocks != PastBlocks:
-                BlockReading = self.read_header((height-1) - CountBlocks)
+                BlockReading = chain.get((height-1) - CountBlocks)
+                if BlockReading is None:
+                    BlockReading = self.read_header((height-1) - CountBlocks)
 
             # if LastBlockTime > 0:
             #     Diff = (LastBlockTime - BlockReading.get('timestamp'))
             #     nActualTimespan += Diff
-            LastBlockTime = BlockReading.get('timestamp')
+            # LastBlockTime = BlockReading.get('timestamp')
 
             # BlockReading = chain.get((height-1) - CountBlocks)
             #BlockReading = self.read_header((height-1) - CountBlocks)
@@ -419,7 +433,9 @@ class Blockchain(util.PrintError):
             return False
         if prev_hash != header.get('prev_block_hash'):
             return False
-        target = self.get_target(height)
+        headers = {}
+        headers[header.get('block_height')] = header
+        target = self.get_target(height, headers)
         try:
             self.verify_header(header, prev_hash, target)
         except BaseException as e:

@@ -8,6 +8,6 @@ Author-email: thomasv@garlium.org
 License: MIT Licence
 Description: Lightweight Garlicoin Wallet
 Platform: UNKNOWN
-Provides-Extra: hardware
 Provides-Extra: fast
 Provides-Extra: full
+Provides-Extra: hardware
