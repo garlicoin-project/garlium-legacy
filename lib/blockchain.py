@@ -185,7 +185,7 @@ class Blockchain(util.PrintError):
     def verify_chunk(self, index, data):
         num = len(data) // 80
         prev_hash = self.get_hash(index * 2016 - 1)
-        target = self.get_target(index-1)
+        target = self.get_target(index)
         for i in range(num):
             raw_header = data[i*80:(i+1) * 80]
             header = deserialize_header(raw_header, index*2016 + i)
@@ -313,46 +313,77 @@ class Blockchain(util.PrintError):
             return ts
         return self.read_header(height).get('timestamp')
 
-    def get_target(self, index):
+    def convbignum(self,bits):
+        MM = 256*256*256
+        a = bits%MM
+        if a < 0x8000:
+            a *= 256
+        target = (a) * pow(2, 8 * (bits//MM - 3))
+        return target
+
+    def get_target(self, height):
         # current difficulty formula, dash - DarkGravity v3, written by Evan Duffield - evan@dash.org 
         # https://github.com/wakiyamap/electrum-mona/blob/master/lib/blockchain.py#L334
         if constants.net.TESTNET:
             return 0
-        pastBlocks = 45
-        if index == -1 or index < pastBlocks:
-            return 0x00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
-        if index < len(self.checkpoints):
-            h, t, _ = self.checkpoints[index]
-            return t
 
-        pastTargetAvg = None
-        pindex = index
-        last = None
-        first = self.read_header(index)
-        # DGW v3
-        for countBlocks in range(1, pastBlocks + 1):
-            last = self.read_header(pindex)
-            bits = last.get('bits')
-            target = self.bits_to_target(bits)
-            if countBlocks == 1:
-                pastTargetAvg = target
+        last = self.read_header(height - 1)
+
+        # params
+        BlockLastSolved = last
+        BlockReading = last
+        BlockCreating = height
+        nActualTimespan = 0
+        LastBlockTime = 0
+        PastBlocks = 45
+        CountBlocks = 0
+        PastDifficultyAverage = 0
+        # PastDifficultyAveragePrev = 0
+        bnNum = 0
+
+        # DGWv3 PastBlocks = 45 Because checkpoint don't have preblock data.
+        if height < PastBlocks:
+            return MAX_TARGET
+        #thanks watanabe!! http://askmona.org/5288#res_61
+        if BlockLastSolved is None:
+            return MAX_TARGET
+        for i in range(1, PastBlocks + 1):
+            CountBlocks += 1
+
+            if CountBlocks == 1:
+                PastDifficultyAverage = self.convbignum(BlockReading.get('bits'))
             else:
-                pastTargetAvg = (pastTargetAvg * countBlocks + target) / (countBlocks + 1)
-            
-            if countBlocks != pastBlocks:
-                pindex = pindex - 1
+                bnNum = self.convbignum(BlockReading.get('bits'))
+                PastDifficultyAverage = ((PastDifficultyAverage * CountBlocks)+(bnNum)) // (CountBlocks + 1)
+            # PastDifficultyAveragePrev = PastDifficultyAverage
 
-        nActualTimespan = last.get('timestamp') - first.get('timestamp')
-        nTargetTimespan = pastBlocks * 40
+            if CountBlocks != PastBlocks:
+                BlockReading = self.read_header((height-1) - CountBlocks)
 
-        nActualTimespan = max(nActualTimespan, nTargetTimespan // 3)
-        nActualTimespan = min(nActualTimespan, nTargetTimespan * 3)
+            # if LastBlockTime > 0:
+            #     Diff = (LastBlockTime - BlockReading.get('timestamp'))
+            #     nActualTimespan += Diff
+            LastBlockTime = BlockReading.get('timestamp')
 
-        newTarget = pastTargetAvg
-        newTarget *= nActualTimespan
-        newTarget //= nTargetTimespan
+            # BlockReading = chain.get((height-1) - CountBlocks)
+            #BlockReading = self.read_header((height-1) - CountBlocks)
+            # if BlockReading is None:
+            # BlockReading = self.read_header((height-1) - CountBlocks)
+                #BlockReading = chain.get((height-1) - CountBlocks)
+        nActualTimespan = BlockLastSolved.get('timestamp') - BlockReading.get('timestamp')
 
-        return min(MAX_TARGET, newTarget)
+        bnNew = PastDifficultyAverage
+        nTargetTimespan = CountBlocks * 40 #1.5 miniutes
+
+        nActualTimespan = max(nActualTimespan, nTargetTimespan//3)
+        nActualTimespan = min(nActualTimespan, nTargetTimespan*3)
+
+        # retarget
+        bnNew *= nActualTimespan
+        bnNew //= nTargetTimespan
+        bnNew = min(bnNew, MAX_TARGET)
+
+        return bnNew
 
     def bits_to_target(self, bits):
         bitsN = (bits >> 24) & 0xff
@@ -388,10 +419,11 @@ class Blockchain(util.PrintError):
             return False
         if prev_hash != header.get('prev_block_hash'):
             return False
-        target = self.get_target(height // 2016 - 1)
+        target = self.get_target(height)
         try:
             self.verify_header(header, prev_hash, target)
         except BaseException as e:
+            print(e)
             return False
         return True
 
@@ -412,7 +444,7 @@ class Blockchain(util.PrintError):
         n = self.height() // 2016
         for index in range(n):
             h = self.get_hash((index+1) * 2016 -1)
-            target = self.get_target(index)
+            target = self.get_target(index + 1)
             # Litecoin: also store the timestamp of the last block
             tstamp = self.get_timestamp((index+1) * 2016 - 1)
             cp.append((h, target, tstamp))

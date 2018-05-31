@@ -1317,7 +1317,6 @@ class Abstract_Wallet(PrintError):
         self.network = network
         if self.network is not None:
             self.verifier = SPV(self.network, self)
-            self.prepare_for_verifier()
             self.synchronizer = Synchronizer(self, network)
             network.add_jobs([self.verifier, self.synchronizer])
         else:
