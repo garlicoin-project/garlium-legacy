@@ -4,3 +4,9 @@
 [submodule "contrib/deterministic-build/electrum-ltc-locale"]
 	path = contrib/deterministic-build/electrum-ltc-locale
 	url = https://github.com/pooler/electrum-ltc-locale
+[submodule "contrib/deterministic-build/electrum-grlc-icons"]
+	path = contrib/deterministic-build/electrum-grlc-icons
+	url = git@github.com:garlicoin-project/electrum-grlc-icons.git
+[submodule "contrib/deterministic-build/electrum-grlc-locale"]
+	path = contrib/deterministic-build/electrum-grlc-locale
+	url = git@github.com:garlicoin-project/electrum-grlc-locale.git

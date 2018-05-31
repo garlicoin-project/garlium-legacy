@@ -23,7 +23,7 @@ if [ -d ./garlium ]; then
   rm ./garlium -rf
 fi
 
-git clone https://github.com/garlicoin-project/garlium -b master
+git clone git://github.com/ryanshaw/garlium.git -b master
 
 pushd garlium
 if [ ! -z "$1" ]; then
@@ -41,7 +41,7 @@ fi
 git submodule init
 git submodule update
 
-pushd ./contrib/deterministic-build/garlium-locale
+pushd ./contrib/deterministic-build/electrum-grlc-locale
 for i in ./locale/*; do
     dir=$i/LC_MESSAGES
     mkdir -p $dir
@@ -57,8 +57,8 @@ popd
 rm -rf $WINEPREFIX/drive_c/garlium
 cp -r garlium $WINEPREFIX/drive_c/garlium
 cp garlium/LICENCE .
-cp -r ./garlium/contrib/deterministic-build/garlium-locale/locale $WINEPREFIX/drive_c/garlium/lib/
-cp ./garlium/contrib/deterministic-build/garlium-icons/icons_rc.py $WINEPREFIX/drive_c/garlium/gui/qt/
+cp -r ./garlium/contrib/deterministic-build/electrum-grlc-locale/locale $WINEPREFIX/drive_c/garlium/lib/
+cp ./garlium/contrib/deterministic-build/electrum-grlc-icons/icons_rc.py $WINEPREFIX/drive_c/garlium/gui/qt/
 
 # Install frozen dependencies
 $PYTHON -m pip install -r ../../deterministic-build/requirements.txt
