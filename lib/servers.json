@@ -3,7 +3,7 @@
         "pruning": "-",
         "s": "50004",
         "t": "50003",
-        "version": "1.1"
+        "version": "1.2"
     },
     "172.93.54.31": {
         "pruning": "-",
@@ -51,13 +51,30 @@
         "pruning": "-",
         "s": "50002",
         "t": "50001",
-        "version": "1.1"
+        "version": "1.2"
+    },
+    "electrum-ltc0.snel.it": {
+        "pruning": "-",
+        "s": "50004",
+        "t": "50003",
+        "version": "1.2"
+    },
+    "electrum.leblancnet.us": {
+        "pruning": "-",
+        "s": "50004",
+        "t": "50003",
+        "version": "1.2"
     },
     "tuxprint.com": {
         "pruning": "-",
         "s": "50002",
         "t": "50001",
-        "version": "1.1"
+        "version": "1.2"
+    },
+    "electrumx.kekku.li": {
+        "pruning": "-",
+        "s": "50003",
+        "version": "1.2"
     },
     "204.13.51.124": {
         "pruning": "-",

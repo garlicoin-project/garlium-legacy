@@ -3,12 +3,11 @@ from kivy.factory import Factory
 from kivy.properties import ObjectProperty
 from kivy.lang import Builder
 
-from electrum_ltc.util import base_units
+from electrum_ltc.util import base_units_list
 from electrum_ltc.i18n import languages
 from electrum_ltc_gui.kivy.i18n import _
 from electrum_ltc.plugins import run_hook
 from electrum_ltc import coinchooser
-from electrum_ltc.util import fee_levels
 
 from .choice_dialog import ChoiceDialog
 
@@ -37,9 +36,8 @@ Builder.load_string('''
                     action: partial(root.language_dialog, self)
                 CardSeparator
                 SettingsItem:
-                    status: '' if root.disable_pin else ('ON' if root.use_encryption else 'OFF')
                     disabled: root.disable_pin
-                    title: _('PIN code') + ': ' + self.status
+                    title: _('PIN code')
                     description: _("Change your PIN code.")
                     action: partial(root.change_password, self)
                 CardSeparator
@@ -48,12 +46,6 @@ Builder.load_string('''
                     title: _('Denomination') + ': ' + self.bu
                     description: _("Base unit for Garlicoin amounts.")
                     action: partial(root.unit_dialog, self)
-                CardSeparator
-                SettingsItem:
-                    status: root.fee_status()
-                    title: _('Fees') + ': ' + self.status
-                    description: _("Fees paid to the Garlicoin miners.")
-                    action: partial(root.fee_dialog, self)
                 CardSeparator
                 SettingsItem:
                     status: root.fx_status()
@@ -73,7 +65,7 @@ Builder.load_string('''
                     description: _("Create replaceable transactions.")
                     message:
                         _('If you check this box, your transactions will be marked as non-final,') \
-                        + ' ' + _('and you will have the possiblity, while they are unconfirmed, to replace them with transactions that pays higher fees.') \
+                        + ' ' + _('and you will have the possibility, while they are unconfirmed, to replace them with transactions that pays higher fees.') \
                         + ' ' + _('Note that some merchants do not accept non-final transactions until they are confirmed.')
                     action: partial(root.boolean_dialog, 'use_rbf', _('Replace by fee'), self.message)
                 CardSeparator
@@ -113,7 +105,6 @@ class SettingsDialog(Factory.Popup):
         layout.bind(minimum_height=layout.setter('height'))
         # cached dialogs
         self._fx_dialog = None
-        self._fee_dialog = None
         self._proxy_dialog = None
         self._language_dialog = None
         self._unit_dialog = None
@@ -145,7 +136,8 @@ class SettingsDialog(Factory.Popup):
             def cb(text):
                 self.app._set_bu(text)
                 item.bu = self.app.base_unit
-            self._unit_dialog = ChoiceDialog(_('Denomination'), list(base_units.keys()), self.app.base_unit, cb)
+            self._unit_dialog = ChoiceDialog(_('Denomination'), base_units_list,
+                                             self.app.base_unit, cb, keep_choice_order=True)
         self._unit_dialog.open()
 
     def coinselect_status(self):
@@ -204,18 +196,7 @@ class SettingsDialog(Factory.Popup):
         d.open()
 
     def fee_status(self):
-        if self.config.get('dynamic_fees', True):
-            return fee_levels[self.config.get('fee_level', 2)]
-        else:
-            return self.app.format_amount_and_units(self.config.fee_per_kb()) + '/kB'
-
-    def fee_dialog(self, label, dt):
-        if self._fee_dialog is None:
-            from .fee_dialog import FeeDialog
-            def cb():
-                label.status = self.fee_status()
-            self._fee_dialog = FeeDialog(self.app, self.config, cb)
-        self._fee_dialog.open()
+        return self.config.get_fee_status()
 
     def boolean_dialog(self, name, title, message, dt):
         from .checkbox_dialog import CheckBoxDialog

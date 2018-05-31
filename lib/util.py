@@ -24,11 +24,13 @@ import binascii
 import os, sys, re, json
 from collections import defaultdict
 from datetime import datetime
+import decimal
 from decimal import Decimal
 import traceback
 import urllib
 import threading
 import hmac
+import stat
 
 from .i18n import _
 
@@ -40,8 +42,26 @@ def inv_dict(d):
     return {v: k for k, v in d.items()}
 
 
-base_units = {'LTC':8, 'mLTC':5, 'uLTC':2}
-fee_levels = [_('Within 25 blocks'), _('Within 10 blocks'), _('Within 5 blocks'), _('Within 2 blocks'), _('In the next block')]
+base_units = {'GRLC':8, 'mGRLC':5, 'uGRLC':2, 'clove':0}
+base_units_inverse = inv_dict(base_units)
+base_units_list = ['GRLC', 'mGRLC', 'uGRLC', 'clove']  # list(dict) does not guarantee order
+
+
+def decimal_point_to_base_unit_name(dp: int) -> str:
+    # e.g. 8 -> "BTC"
+    try:
+        return base_units_inverse[dp]
+    except KeyError:
+        raise Exception('Unknown base unit')
+
+
+def base_unit_name_to_decimal_point(unit_name: str) -> int:
+    # e.g. "BTC" -> 8
+    try:
+        return base_units[unit_name]
+    except KeyError:
+        raise Exception('Unknown base unit')
+
 
 def normalize_version(v):
     return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
@@ -58,17 +78,86 @@ class InvalidPassword(Exception):
     def __str__(self):
         return _("Incorrect password")
 
+
+class FileImportFailed(Exception):
+    def __init__(self, message=''):
+        self.message = str(message)
+
+    def __str__(self):
+        return _("Failed to import from file.") + "\n" + self.message
+
+
+class FileExportFailed(Exception):
+    def __init__(self, message=''):
+        self.message = str(message)
+
+    def __str__(self):
+        return _("Failed to export to file.") + "\n" + self.message
+
+
+class TimeoutException(Exception):
+    def __init__(self, message=''):
+        self.message = str(message)
+
+    def __str__(self):
+        if not self.message:
+            return _("Operation timed out.")
+        return self.message
+
+
+class WalletFileException(Exception): pass
+
+
+class BitcoinException(Exception): pass
+
+
 # Throw this exception to unwind the stack like when an error occurs.
 # However unlike other exceptions the user won't be informed.
 class UserCancelled(Exception):
     '''An exception that is suppressed from the user'''
     pass
 
+class Satoshis(object):
+    def __new__(cls, value):
+        self = super(Satoshis, cls).__new__(cls)
+        self.value = value
+        return self
+
+    def __repr__(self):
+        return 'Satoshis(%d)'%self.value
+
+    def __str__(self):
+        return format_satoshis(self.value) + " LTC"
+
+class Fiat(object):
+    def __new__(cls, value, ccy):
+        self = super(Fiat, cls).__new__(cls)
+        self.ccy = ccy
+        self.value = value
+        return self
+
+    def __repr__(self):
+        return 'Fiat(%s)'% self.__str__()
+
+    def __str__(self):
+        if self.value.is_nan():
+            return _('No Data')
+        else:
+            return "{:.2f}".format(self.value) + ' ' + self.ccy
+
 class MyEncoder(json.JSONEncoder):
     def default(self, obj):
         from .transaction import Transaction
         if isinstance(obj, Transaction):
             return obj.as_dict()
+        if isinstance(obj, Satoshis):
+            return str(obj)
+        if isinstance(obj, Fiat):
+            return str(obj)
+        if isinstance(obj, Decimal):
+            return str(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat(' ')[:-3]
         return super(MyEncoder, self).default(obj)
 
 class PrintError(object):
@@ -77,7 +166,11 @@ class PrintError(object):
         return self.__class__.__name__
 
     def print_error(self, *msg):
+        # only prints with --verbose flag
         print_error("[%s]" % self.diagnostic_name(), *msg)
+
+    def print_stderr(self, *msg):
+        print_stderr("[%s]" % self.diagnostic_name(), *msg)
 
     def print_msg(self, *msg):
         print_msg("[%s]" % self.diagnostic_name(), *msg)
@@ -254,8 +347,29 @@ def android_check_data_dir():
         shutil.move(old_electrum_dir, data_dir)
     return data_dir
 
+
 def get_headers_dir(config):
     return android_headers_dir() if 'ANDROID_DATA' in os.environ else config.path
+
+
+def assert_datadir_available(config_path):
+    path = config_path
+    if os.path.exists(path):
+        return
+    else:
+        raise FileNotFoundError(
+            'Electrum datadir does not exist. Was it deleted while running?' + '\n' +
+            'Should be at {}'.format(path))
+
+
+def assert_file_in_datadir_available(path, config_path):
+    if os.path.exists(path):
+        return
+    else:
+        assert_datadir_available(config_path)
+        raise FileNotFoundError(
+            'Cannot find file but datadir is there.' + '\n' +
+            'Should be at {}'.format(path))
 
 
 def assert_bytes(*args):
@@ -340,20 +454,18 @@ def format_satoshis_plain(x, decimal_point = 8):
     return "{:.8f}".format(Decimal(x) / scale_factor).rstrip('0').rstrip('.')
 
 
-def format_satoshis(x, is_diff=False, num_zeros = 0, decimal_point = 8, whitespaces=False):
+def format_satoshis(x, num_zeros=0, decimal_point=8, precision=None, is_diff=False, whitespaces=False):
     from locale import localeconv
     if x is None:
         return 'unknown'
-    x = int(x)  # Some callers pass Decimal
-    scale_factor = pow (10, decimal_point)
-    integer_part = "{:n}".format(int(abs(x) / scale_factor))
-    if x < 0:
-        integer_part = '-' + integer_part
-    elif is_diff:
-        integer_part = '+' + integer_part
+    if precision is None:
+        precision = decimal_point
+    decimal_format = ".0" + str(precision) if precision > 0 else ""
+    if is_diff:
+        decimal_format = '+' + decimal_format
+    result = ("{:" + decimal_format + "f}").format(x / pow (10, decimal_point)).rstrip('0')
+    integer_part, fract_part = result.split(".")
     dp = localeconv()['decimal_point']
-    fract_part = ("{:0" + str(decimal_point) + "}").format(abs(x) % scale_factor)
-    fract_part = fract_part.rstrip('0')
     if len(fract_part) < num_zeros:
         fract_part += "0" * (num_zeros - len(fract_part))
     result = integer_part + dp + fract_part
@@ -362,11 +474,26 @@ def format_satoshis(x, is_diff=False, num_zeros = 0, decimal_point = 8, whitespa
         result = " " * (15 - len(result)) + result
     return result
 
-def timestamp_to_datetime(timestamp):
-    try:
-        return datetime.fromtimestamp(timestamp)
-    except:
+
+FEERATE_PRECISION = 1  # num fractional decimal places for sat/byte fee rates
+_feerate_quanta = Decimal(10) ** (-FEERATE_PRECISION)
+
+
+def format_fee_satoshis(fee, num_zeros=0):
+    return format_satoshis(fee, num_zeros, 0, precision=FEERATE_PRECISION)
+
+
+def quantize_feerate(fee):
+    """Strip sat/byte fee rate of excess precision."""
+    if fee is None:
         return None
+    return Decimal(fee).quantize(_feerate_quanta, rounding=decimal.ROUND_HALF_DOWN)
+
+
+def timestamp_to_datetime(timestamp):
+    if timestamp is None:
+        return None
+    return datetime.fromtimestamp(timestamp)
 
 def format_time(timestamp):
     date = timestamp_to_datetime(timestamp)
@@ -445,11 +572,11 @@ testnet_block_explorers = {
 }
 
 def block_explorer_info():
-    from . import bitcoin
-    return testnet_block_explorers if bitcoin.NetworkConstants.TESTNET else mainnet_block_explorers
+    from . import constants
+    return testnet_block_explorers if constants.net.TESTNET else mainnet_block_explorers
 
 def block_explorer(config):
-    return config.get('block_explorer', 'SoChain')
+    return config.get('block_explorer', 'LiteCore')
 
 def block_explorer_tuple(config):
     return block_explorer_info().get(block_explorer(config))
@@ -462,7 +589,7 @@ def block_explorer_URL(config, kind, item):
     if not kind_str:
         return
     url_parts = [be_tuple[0], kind_str, item]
-    return "/".join(url_parts)
+    return ''.join(url_parts)
 
 # URL decode
 #_ud = re.compile('%([0-9a-hA-H]{2})', re.MULTILINE)
@@ -474,12 +601,12 @@ def parse_URI(uri, on_pr=None):
 
     if ':' not in uri:
         if not bitcoin.is_address(uri):
-            raise BaseException("Not a garlicoin address")
+            raise Exception("Not a Garlicoin address")
         return {'address': uri}
 
     u = urllib.parse.urlparse(uri)
     if u.scheme != 'garlicoin':
-        raise BaseException("Not a garlicoin URI")
+        raise Exception("Not a Garlicoin URI")
     address = u.path
 
     # python for android fails to parse query
@@ -496,7 +623,7 @@ def parse_URI(uri, on_pr=None):
     out = {k: v[0] for k, v in pq.items()}
     if address:
         if not bitcoin.is_address(address):
-            raise BaseException("Invalid garlicoin address:" + address)
+            raise Exception("Invalid Garlicoin address:" + address)
         out['address'] = address
     if 'amount' in out:
         am = out['amount']
@@ -645,10 +772,6 @@ class SocketPipe:
                 print_error("SSLError:", e)
                 time.sleep(0.1)
                 continue
-            except OSError as e:
-                print_error("OSError", e)
-                time.sleep(0.1)
-                continue
 
 
 class QueuePipe:
@@ -685,25 +808,65 @@ class QueuePipe:
             self.send(request)
 
 
-def check_www_dir(rdir):
-    import urllib, shutil, os
-    if not os.path.exists(rdir):
-        os.mkdir(rdir)
-    index = os.path.join(rdir, 'index.html')
-    if not os.path.exists(index):
-        print_error("copying index.html")
-        src = os.path.join(os.path.dirname(__file__), 'www', 'index.html')
-        shutil.copy(src, index)
-    files = [
-        "https://code.jquery.com/jquery-1.9.1.min.js",
-        "https://raw.githubusercontent.com/davidshimjs/qrcodejs/master/qrcode.js",
-        "https://code.jquery.com/ui/1.10.3/jquery-ui.js",
-        "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css"
-    ]
-    for URL in files:
-        path = urllib.parse.urlsplit(URL).path
-        filename = os.path.basename(path)
-        path = os.path.join(rdir, filename)
-        if not os.path.exists(path):
-            print_error("downloading ", URL)
-            urllib.request.urlretrieve(URL, path)
+
+
+def setup_thread_excepthook():
+    """
+    Workaround for `sys.excepthook` thread bug from:
+    http://bugs.python.org/issue1230540
+
+    Call once from the main thread before creating any threads.
+    """
+
+    init_original = threading.Thread.__init__
+
+    def init(self, *args, **kwargs):
+
+        init_original(self, *args, **kwargs)
+        run_original = self.run
+
+        def run_with_except_hook(*args2, **kwargs2):
+            try:
+                run_original(*args2, **kwargs2)
+            except Exception:
+                sys.excepthook(*sys.exc_info())
+
+        self.run = run_with_except_hook
+
+    threading.Thread.__init__ = init
+
+
+def versiontuple(v):
+    return tuple(map(int, (v.split("."))))
+
+
+def import_meta(path, validater, load_meta):
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            d = validater(json.loads(f.read()))
+        load_meta(d)
+    #backwards compatibility for JSONDecodeError
+    except ValueError:
+        traceback.print_exc(file=sys.stderr)
+        raise FileImportFailed(_("Invalid JSON code."))
+    except BaseException as e:
+        traceback.print_exc(file=sys.stdout)
+        raise FileImportFailed(e)
+
+
+def export_meta(meta, fileName):
+    try:
+        with open(fileName, 'w+', encoding='utf-8') as f:
+            json.dump(meta, f, indent=4, sort_keys=True)
+    except (IOError, os.error) as e:
+        traceback.print_exc(file=sys.stderr)
+        raise FileExportFailed(e)
+
+
+def make_dir(path, allow_symlink=True):
+    """Make directory if it does not yet exist."""
+    if not os.path.exists(path):
+        if not allow_symlink and os.path.islink(path):
+            raise Exception('Dangling link: ' + path)
+        os.mkdir(path)
+        os.chmod(path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)

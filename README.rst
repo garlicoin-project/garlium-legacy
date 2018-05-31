@@ -1,6 +1,8 @@
 Garlium - Lightweight Garlicoin client
 ==========================================
 
+Electrum-LTC is a port of Electrum, the Bitcoin wallet, to Litecoin.
+
 ::
 
   Licence: MIT Licence
@@ -31,10 +33,12 @@ directory. To run Garlium from its root directory, just do::
 You can also install Garlium on your system, by running this command::
 
     sudo apt-get install python3-setuptools
-    python3 setup.py install
+    pip3 install .[full]
 
 This will download and install the Python dependencies used by
 Garlium, instead of using the 'packages' directory.
+The 'full' extra contains some optional dependencies that we think
+are often useful but they are not strictly needed.
 
 If you cloned the git repository, you need to compile extra files
 before you can run Garlium. Read the next section, "Development
@@ -45,14 +49,14 @@ Version".
 Development version
 ===================
 
-Check out the code from Github::
+Check out the code from GitHub::
 
     git clone git://github.com/xSke/garlium.git
     cd garlium
 
 Run install (this should install dependencies)::
 
-    python3 setup.py install
+    pip3 install .[full]
 
 Compile the icons file for Qt::
 
@@ -80,25 +84,17 @@ To create binaries, create the 'packages' directory::
 
     ./contrib/make_packages
 
-This directory contains the python dependencies used by Electrum.
+This directory contains the python dependencies used by Electrum-LTC.
 
 Mac OS X / macOS
 --------
 
-::
-
-    # On MacPorts installs: 
-    sudo python3 setup-release.py py2app
-    
-    # On Homebrew installs: 
-    ARCHFLAGS="-arch i386 -arch x86_64" sudo python3 setup-release.py py2app --includes sip
-    
-    sudo hdiutil create -fs HFS+ -volname "Garlium" -srcfolder dist/Garlium.app dist/garlium-VERSION-macosx.dmg
+See `contrib/build-osx/`.
 
 Windows
 -------
 
-See `contrib/build-wine/README` file.
+See `contrib/build-wine/`.
 
 
 Android

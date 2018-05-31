@@ -1,6 +1,6 @@
 # -*- mode: python -*-
 
-from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules, collect_dynamic_libs
 
 import sys
 for i, x in enumerate(sys.argv):
@@ -8,8 +8,10 @@ for i, x in enumerate(sys.argv):
         cmdline_name = sys.argv[i+1]
         break
 else:
-    raise BaseException('no name')
+    raise Exception('no name')
 
+PYTHON_VERSION = '3.5.4'
+PYHOME = 'c:/python' + PYTHON_VERSION
 
 home = 'C:\\garlium\\'
 
@@ -17,8 +19,17 @@ home = 'C:\\garlium\\'
 hiddenimports = []
 hiddenimports += collect_submodules('trezorlib')
 hiddenimports += collect_submodules('btchip')
-#hiddenimports += collect_submodules('keepkeylib')
+hiddenimports += collect_submodules('keepkeylib')
+hiddenimports += collect_submodules('websocket')
 hiddenimports += ['_scrypt']
+
+# Add libusb binary
+binaries = [(PYHOME+"/libusb-1.0.dll", ".")]
+
+# Workaround for "Retro Look":
+binaries += [b for b in collect_dynamic_libs('PyQt5') if 'qwindowsvista' in b[0]]
+
+binaries += [('C:/tmp/libsecp256k1.dll', '.')]
 
 datas = [
     (home+'lib/currencies.json', 'electrum_ltc'),
@@ -29,6 +40,7 @@ datas = [
     (home+'lib/wordlist/english.txt', 'electrum_ltc/wordlist'),
 #    (home+'lib/locale', 'electrum_ltc/locale'),
     (home+'plugins', 'electrum_ltc_plugins'),
+    ('C:\\Program Files (x86)\\ZBar\\bin\\', '.')
 ]
 datas += collect_data_files('trezorlib')
 datas += collect_data_files('btchip')
@@ -53,6 +65,7 @@ a = Analysis([home+'garlium',
               home+'plugins/ledger/qt.py',
               #home+'packages/requests/utils.py'
               ],
+             binaries=binaries,
              datas=datas,
              #pathex=[home+'lib', home+'gui', home+'plugins'],
              hiddenimports=hiddenimports,

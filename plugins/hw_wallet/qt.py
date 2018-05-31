@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # -*- mode: python -*-
 #
 # Electrum - lightweight Bitcoin client
@@ -34,14 +34,14 @@ from electrum_ltc.i18n import _
 from electrum_ltc.util import PrintError
 
 # The trickiest thing about this handler was getting windows properly
-# parented on MacOSX.
+# parented on macOS.
 class QtHandlerBase(QObject, PrintError):
     '''An interface between the GUI (here, QT) and the device handling
     logic for handling I/O.'''
 
     passphrase_signal = pyqtSignal(object, object)
     message_signal = pyqtSignal(object, object)
-    error_signal = pyqtSignal(object)
+    error_signal = pyqtSignal(object, object)
     word_signal = pyqtSignal(object)
     clear_signal = pyqtSignal()
     query_signal = pyqtSignal(object, object)
@@ -70,9 +70,10 @@ class QtHandlerBase(QObject, PrintError):
         self.status_signal.emit(paired)
 
     def _update_status(self, paired):
-        button = self.button
-        icon = button.icon_paired if paired else button.icon_unpaired
-        button.setIcon(QIcon(icon))
+        if hasattr(self, 'button'):
+            button = self.button
+            icon = button.icon_paired if paired else button.icon_unpaired
+            button.setIcon(QIcon(icon))
 
     def query_choice(self, msg, labels):
         self.done.clear()
@@ -89,8 +90,11 @@ class QtHandlerBase(QObject, PrintError):
     def show_message(self, msg, on_cancel=None):
         self.message_signal.emit(msg, on_cancel)
 
-    def show_error(self, msg):
-        self.error_signal.emit(msg)
+    def show_error(self, msg, blocking=False):
+        self.done.clear()
+        self.error_signal.emit(msg, blocking)
+        if blocking:
+            self.done.wait()
 
     def finished(self):
         self.clear_signal.emit()
@@ -143,7 +147,7 @@ class QtHandlerBase(QObject, PrintError):
     def message_dialog(self, msg, on_cancel):
         # Called more than once during signing, to confirm output and fee
         self.clear_dialog()
-        title = _('Please check your %s device') % self.device
+        title = _('Please check your {} device').format(self.device)
         self.dialog = dialog = WindowModalDialog(self.top_level_window(), title)
         l = QLabel(msg)
         vbox = QVBoxLayout(dialog)
@@ -153,8 +157,10 @@ class QtHandlerBase(QObject, PrintError):
             vbox.addLayout(Buttons(CancelButton(dialog)))
         dialog.show()
 
-    def error_dialog(self, msg):
+    def error_dialog(self, msg, blocking):
         self.win.show_error(msg, parent=self.top_level_window())
+        if blocking:
+            self.done.set()
 
     def clear_dialog(self):
         if self.dialog:
@@ -183,10 +189,12 @@ class QtPluginBase(object):
             if not isinstance(keystore, self.keystore_class):
                 continue
             if not self.libraries_available:
-                window.show_error(
-                    _("Cannot find python library for") + " '%s'.\n" % self.name \
-                    + _("Make sure you install it with python3")
-                )
+                if hasattr(self, 'libraries_available_message'):
+                    message = self.libraries_available_message + '\n'
+                else:
+                    message = _("Cannot find python library for") + " '%s'.\n" % self.name
+                message += _("Make sure you install it with python3")
+                window.show_error(message)
                 return
             tooltip = self.device + '\n' + (keystore.label or 'unnamed')
             cb = partial(self.show_settings_dialog, window, keystore)
@@ -198,6 +206,7 @@ class QtPluginBase(object):
             handler.button = button
             keystore.handler = handler
             keystore.thread = TaskThread(window, window.on_error)
+            self.add_show_address_on_hw_device_button_for_receive_addr(wallet, keystore, window)
             # Trigger a pairing
             keystore.thread.add(partial(self.get_client, keystore))
 
@@ -215,3 +224,12 @@ class QtPluginBase(object):
 
     def show_settings_dialog(self, window, keystore):
         device_id = self.choose_device(window, keystore)
+
+    def add_show_address_on_hw_device_button_for_receive_addr(self, wallet, keystore, main_window):
+        plugin = keystore.plugin
+        receive_address_e = main_window.receive_address_e
+
+        def show_address():
+            addr = receive_address_e.text()
+            keystore.thread.add(partial(plugin.show_address, wallet, addr, keystore))
+        receive_address_e.addButton(":icons/eye1.png", show_address, _("Show on {}").format(plugin.device))

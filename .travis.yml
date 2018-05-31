@@ -1,45 +1,58 @@
 sudo: false
+language: python
+python:
+    - 3.5
+    - 3.6
+addons:
+  apt:
+    sources:
+      - sourceline: 'ppa:tah83/secp256k1'
+    packages:
+      - libsecp256k1-0
 install:
-  - source env/bin/activate
-  - pip install -r contrib/requirements.txt
-  - pip install pyinstaller
-  - pip install PyQt5
-  - pip install trezor==0.7.16
-  - pip install keepkey==4.0.0
-  - pip install btchip-python==0.1.23
-  - pip install pycryptodomex
-
-
-matrix:
+  - pip install -r contrib/requirements/requirements-travis.txt
+cache:
+  - pip: true
+  - directories:
+    - /tmp/electrum-ltc-build
+script:
+    - tox
+after_success:
+    - if [ "$TRAVIS_BRANCH" = "master" ]; then pip install pycurl requests && contrib/make_locale; fi
+    - coveralls
+jobs:
   include:
-    - language: generic
-      os: osx
-      before_install:
-        - export LDFLAGS="-L$(brew --prefix openssl)/lib"
-        - export CFLAGS="-I$(brew --prefix openssl)/include"
-        - brew update
-        - brew install python3
-        - virtualenv env -p python3
-        - source env/bin/activate
+    - stage: binary builds
+      sudo: true
+      env:
+        - TARGET_OS=Windows
+      python: 3.6
+      install:
+        - sudo dpkg --add-architecture i386
+        - wget -nc https://dl.winehq.org/wine-builds/Release.key
+        - sudo apt-key add Release.key
+        - sudo apt-add-repository https://dl.winehq.org/wine-builds/ubuntu/
+        - sudo apt-get update -qq
+        - sudo apt-get install -qq winehq-stable dirmngr gnupg2 p7zip-full mingw-w64
+      before_script: ls -lah /tmp/electrum-ltc-build
+      script: ./contrib/build-wine/build.sh $TRAVIS_COMMIT
+      after_success: true
+    - os: osx
+      language: c
+      env:
+        - TARGET_OS=macOS
+      python: false
+      install:
+        - git fetch --all --tags
+        - git fetch origin --unshallow
+      script: ./contrib/build-osx/make_osx
+      after_script: ls -lah dist && md5 dist/*
+      after_success: true
+    - stage: release check
+      install:
+          - git fetch --all --tags
+          - git fetch origin --unshallow
       script:
-        - source env/bin/activate
-        - export LDFLAGS="-L$(brew --prefix openssl)/lib"
-        - export CFLAGS="-I$(brew --prefix openssl)/include"
-        - rm -rf dist
-        - export PYTHONHASHSEED=22
-        - pyinstaller --noconfirm --ascii --name b$TRAVIS_BUILD_NUMBER-$TRAVIS_BRANCH contrib/osx.spec
-        - hdiutil create -fs HFS+ -volname "Garlium" -srcfolder dist/Garlium.app dist/Garlium.dmg
-
-branches:
-  except:
-  - osx-builds
-
-deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN  # Set in travis-ci.org dashboard, marked secure
-  keep-history: false
-  local-dir: dist/
-  target-branch: osx-builds
-  on:
-    branch: master
+        - ./contrib/deterministic-build/check_submodules.sh
+      after_success: true
+      if: tag IS present

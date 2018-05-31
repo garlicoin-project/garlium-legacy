@@ -64,7 +64,7 @@ class WsClientThread(util.DaemonThread):
         # read json file
         rdir = self.config.get('requests_dir')
         n = os.path.join(rdir, 'req', request_id[0], request_id[1], request_id, request_id + '.json')
-        with open(n) as f:
+        with open(n, encoding='utf-8') as f:
             s = f.read()
         d = json.loads(s)
         addr = d.get('address')
@@ -84,8 +84,7 @@ class WsClientThread(util.DaemonThread):
             l = self.subscriptions.get(addr, [])
             l.append((ws, amount))
             self.subscriptions[addr] = l
-            self.network.send([('blockchain.address.subscribe', [addr])], self.response_queue.put)
-
+            self.network.subscribe_to_addresses([addr], self.response_queue.put)
 
     def run(self):
         threading.Thread(target=self.reading_thread).start()
@@ -100,10 +99,13 @@ class WsClientThread(util.DaemonThread):
             result = r.get('result')
             if result is None:
                 continue    
-            if method == 'blockchain.address.subscribe':
-                self.network.send([('blockchain.address.get_balance', params)], self.response_queue.put)
-            elif method == 'blockchain.address.get_balance':
-                addr = params[0]
+            if method == 'blockchain.scripthash.subscribe':
+                self.network.send([('blockchain.scripthash.get_balance', params)], self.response_queue.put)
+            elif method == 'blockchain.scripthash.get_balance':
+                h = params[0]
+                addr = self.network.h2addr.get(h, None)
+                if addr is None:
+                    util.print_error("can't find address for scripthash: %s" % h)
                 l = self.subscriptions.get(addr, [])
                 for ws, amount in l:
                     if not ws.closed:
