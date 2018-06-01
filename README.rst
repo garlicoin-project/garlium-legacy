@@ -1,7 +1,7 @@
 Garlium - Lightweight Garlicoin client
 ==========================================
 
-Electrum-LTC is a port of Electrum, the Bitcoin wallet, to Litecoin.
+Garlium is a port of Electrum, the Bitcoin wallet, to Litecoin.
 
 ::
 
@@ -84,7 +84,7 @@ To create binaries, create the 'packages' directory::
 
     ./contrib/make_packages
 
-This directory contains the python dependencies used by Electrum-LTC.
+This directory contains the python dependencies used by Garlium.
 
 Mac OS X / macOS
 --------

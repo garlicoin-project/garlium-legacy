@@ -9,5 +9,5 @@ License: MIT Licence
 Description: Lightweight Garlicoin Wallet
 Platform: UNKNOWN
 Provides-Extra: fast
-Provides-Extra: full
 Provides-Extra: hardware
+Provides-Extra: full

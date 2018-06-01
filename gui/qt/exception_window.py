@@ -53,7 +53,7 @@ issue_template = """<h2>Traceback</h2>
   <li>Locale: {locale}</li>
 </ul>
 """
-report_server = "https://crashhub.electrum-ltc.org/crash"
+report_server = "https://crashhub.garlium.org/crash"
 
 
 class Exception_Window(QWidget, MessageBoxMixin):
@@ -63,7 +63,7 @@ class Exception_Window(QWidget, MessageBoxMixin):
         self.exc_args = (exctype, value, tb)
         self.main_window = main_window
         QWidget.__init__(self)
-        self.setWindowTitle('Electrum-LTC - ' + _('An Error Occurred'))
+        self.setWindowTitle('Garlium - ' + _('An Error Occurred'))
         self.setMinimumSize(600, 300)
 
         main_box = QVBoxLayout()
@@ -111,7 +111,7 @@ class Exception_Window(QWidget, MessageBoxMixin):
         self.show()
 
     def send_report(self):
-        if constants.net.GENESIS[-4:] not in ["29a0", "bfe2"] and ".electrum-ltc.org" in report_server:
+        if constants.net.GENESIS[-4:] not in ["29a0", "bfe2"] and ".garlium.org" in report_server:
             # Gah! Some kind of altcoin wants to send us crash reports.
             self.main_window.show_critical(_("Please report this issue manually."))
             return

@@ -19,15 +19,15 @@ function get_git_mtime {
 fail=0
 
 for f in icons/* "icons.qrc"; do
-    if (( $(get_git_mtime "$f") > $(get_git_mtime "contrib/deterministic-build/electrum-ltc-icons/") )); then
+    if (( $(get_git_mtime "$f") > $(get_git_mtime "contrib/deterministic-build/garlium-icons/") )); then
         echo "Modification time of $f (" $(get_git_mtime --readable "$f") ") is newer than"\
-             "last update of electrum-ltc-icons"
+             "last update of garlium-icons"
         fail=1
     fi
 done
 
-if [ $(date +%s -d "2 weeks ago") -gt $(get_git_mtime "contrib/deterministic-build/electrum-ltc-locale/") ]; then
-    echo "Last update from electrum-ltc-locale is older than 2 weeks."\
+if [ $(date +%s -d "2 weeks ago") -gt $(get_git_mtime "contrib/deterministic-build/garlium-locale/") ]; then
+    echo "Last update from garlium-locale is older than 2 weeks."\
          "Please update it to incorporate the latest translations from crowdin."
     fail=1
 fi

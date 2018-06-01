@@ -93,7 +93,7 @@ echo "done"
 
 wine 'wineboot'
 
-cd /tmp/electrum-ltc-build
+cd /tmp/garlium-build
 
 # Install Python
 # note: you might need "sudo apt-get install dirmngr" for the following
