@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME_ROOT=Garlium
+NAME_ROOT=garlium
 PYTHON_VERSION=3.5.4
 
 # These settings probably don't need any change
@@ -95,4 +95,4 @@ cp $NAME_ROOT.zip $NAME_ROOT-$VERSIOn.exe
 cd ..
 
 echo "Done."
-md5sum dist/electrum*exe
+md5sum dist/garlium*exe
