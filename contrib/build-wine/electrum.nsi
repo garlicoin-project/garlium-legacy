@@ -6,8 +6,8 @@
 ;--------------------------------
 ;Variables
 
-  !define PRODUCT_NAME "Electrum-LTC"
-  !define PRODUCT_WEB_SITE "https://github.com/pooler/electrum-ltc"
+  !define PRODUCT_NAME "Garlium"
+  !define PRODUCT_WEB_SITE "https://github.com/ryan-shaw/garlium"
   !define PRODUCT_PUBLISHER "Electrum Technologies GmbH"
   !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 
@@ -16,7 +16,7 @@
 
   ;Name and file
   Name "${PRODUCT_NAME}"
-  OutFile "dist/electrum-ltc-setup.exe"
+  OutFile "dist/garlium-setup.exe"
 
   ;Default installation folder
   InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
@@ -72,7 +72,7 @@
   !define MUI_ABORTWARNING
   !define MUI_ABORTWARNING_TEXT "Are you sure you wish to abort the installation of ${PRODUCT_NAME}?"
   
-  !define MUI_ICON "tmp\electrum-ltc\icons\garlium.ico"
+  !define MUI_ICON "tmp\garlium\icons\garlium.ico"
   
 ;--------------------------------
 ;Pages
