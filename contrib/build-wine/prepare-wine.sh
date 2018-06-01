@@ -5,7 +5,7 @@ NSIS_FILENAME=nsis-3.03-setup.exe
 NSIS_URL=https://prdownloads.sourceforge.net/nsis/$NSIS_FILENAME?download
 NSIS_SHA256=bd3b15ab62ec6b0c7a00f46022d441af03277be893326f6fea8e212dc2d77743
 
-ALLIUM_HASH_PYTHON_URL=https://github.com/ryan-shaw/allium-hash-python/releases/download/v1.0.0/allium_hash-1.0.2-cp36-cp36m-win32.whl
+ALLIUM_HASH_PYTHON_URL=https://github.com/ryan-shaw/allium-hash-python/releases/download/v1.0.0/allium_hash-1.0.2-cp35-cp35m-win32.whl
 
 LIB_GCC_FILENAME=libgcc-6.3.0-1-mingw32-dll-1.tar.xz
 LIB_GCC_URL=https://netix.dl.sourceforge.net/project/mingw/MinGW/Base/gcc/Version6/gcc-6.3.0/$LIB_GCC_FILENAME
