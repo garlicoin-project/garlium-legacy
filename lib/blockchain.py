@@ -21,6 +21,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import os
+import scrypt
 import threading
 import allium_hash
 
@@ -33,14 +34,7 @@ def get_n_factor(timestamp):
     return 10
     #return (timestamp - constants.net.ADAPTIVE_N_EPOCH) // constants.net.ADAPTIVE_N_INTERVAL + constants.net.ADAPTIVE_N_INITIAL
 
-try:
-    import scrypt
-    getScryptPow = lambda x, t: scrypt.hash(x, x, N=(2 << get_n_factor(t)), r=1, p=1, buflen=32)
-except ImportError:
-    util.print_msg("Warning: package scrypt not available; synchronization could be very slow")
-
-    from .scrypt import scrypt_n_1_1_80
-    getScryptPow = lambda x, t: scrypt_n_1_1_80(x, (2 << get_n_factor(t)))
+getScryptPow = lambda x, t: scrypt.hash(x, x, N=(2 << get_n_factor(t)), r=1, p=1, buflen=32)
 
 MAX_TARGET = 0x00000FFFFF000000000000000000000000000000000000000000000000000000
 

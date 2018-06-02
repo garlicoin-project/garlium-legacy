@@ -1017,6 +1017,8 @@ class Network(util.DaemonThread):
             self.request_header(interface, min(tip +1, height - 1))
         else:
             chain = self.blockchains[0]
+            if chain.catch_up and chain.catch_up.closed_remotely:
+                chain.catch_up = None
             if chain.catch_up is None:
                 chain.catch_up = interface
                 interface.mode = 'catch_up'

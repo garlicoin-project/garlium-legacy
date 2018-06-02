@@ -42,7 +42,7 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
 
 extras_require = {
     'hardware': requirements_hw,
-    'fast': ['pycryptodomex', 'scrypt>=0.6.0'],
+    'fast': ['pycryptodomex'],
 }
 extras_require['full'] = extras_require['hardware'] + extras_require['fast']
 
