@@ -24,3 +24,4 @@ bin/
 .idea/
 
 contrib/build-wine/tmp
+.DS_Store
