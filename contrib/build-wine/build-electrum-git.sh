@@ -23,7 +23,7 @@ if [ -d ./garlium ]; then
   rm ./garlium -rf
 fi
 
-git clone git@github.com:ryan-shaw/garlium.git -b master
+git clone git@github.com:garlicoin-project/garlium.git -b master
 
 pushd garlium
 if [ ! -z "$1" ]; then
