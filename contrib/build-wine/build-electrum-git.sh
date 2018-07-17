@@ -90,14 +90,5 @@ popd
 # $VERSION could be passed to the electrum.nsi script, but this would require some rewriting in the script itself.
 wine "$WINEPREFIX/drive_c/Program Files (x86)/NSIS/makensis.exe" /DPRODUCT_VERSION=$VERSION electrum.nsi
 
-cd dist
-cp $NAME_ROOT-setup.exe $NAME_ROOT-$VERSION-setup.exe
-cp $NAME_ROOT.exe $NAME_ROOT-$VERSION.exe
-cp $NAME_ROOT-portable.exe $NAME_ROOT-$VERSION-portable.exe
-
-zip -r9 $NAME_ROOT.zip garlium/
-cp $NAME_ROOT.zip $NAME_ROOT-$VERSIOn.exe
-cd ..
-
 echo "Done."
 md5sum dist/garlium*exe
