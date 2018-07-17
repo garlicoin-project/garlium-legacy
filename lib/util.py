@@ -554,18 +554,16 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'explorer.garlicoin.io': ('http://explorer.garlicoin.io',
-                        {'tx': 'tx', 'addr': 'address'}),
-    'Bakery': ('https://explorer.grlc-bakery.fun',
+    'Bakery': ('https://explorer.grlc-bakery.fun/',
+                        {'tx': 'tx/', 'addr': 'address'}),
+    'Insight': ('https://garlicinsight.com/',
                         {'tx': 'tx/', 'addr': 'address'}),
     'system default': ('blockchain:',
                         {'tx': 'tx', 'addr': 'address'}),
 }
 
 testnet_block_explorers = {
-    'Bakery': ('https://explorer.grlc-bakery.fun',
-                        {'tx': 'tx', 'addr': 'address'}),
-    'explorer.garlicoin.net': ('http://explorer.garlicoin.net',
+    'Bakery': ('https://explorer.grlc-bakery.fun/',
                         {'tx': 'tx', 'addr': 'address'}),
     'system default': ('blockchain:',
                        {'tx': 'tx', 'addr': 'address'}),

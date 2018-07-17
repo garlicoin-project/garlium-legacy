@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Garlium
-Version: 3.1.3.1
+Version: 2.0.0.1
 Summary: Lightweight Garlium Wallet
 Home-page: http://github.com/xSke/garlium
 Author: Thomas Voegtlin
@@ -9,5 +9,5 @@ License: MIT Licence
 Description: Lightweight Garlicoin Wallet
 Platform: UNKNOWN
 Provides-Extra: hardware
-Provides-Extra: fast
 Provides-Extra: full
+Provides-Extra: fast
