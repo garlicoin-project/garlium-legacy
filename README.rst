@@ -33,7 +33,7 @@ directory. To run Garlium from its root directory, just do::
 You can also install Garlium on your system, by running this command::
 
     sudo apt-get install python3-setuptools
-    pip3 install .[full]
+    pip3 install .[fast]
 
 This will download and install the Python dependencies used by
 Garlium, instead of using the 'packages' directory.
@@ -56,7 +56,11 @@ Check out the code from GitHub::
 
 Run install (this should install dependencies)::
 
-    pip3 install .[full]
+    pip3 install .[fast]
+
+Render the SVG icons to PNGs (optional)::
+
+    for i in lock unlock confirmed status_lagging status_disconnected status_connected_proxy status_connected status_waiting preferences; do convert -background none icons/$i.svg icons/$i.png; done
 
 Compile the icons file for Qt::
 

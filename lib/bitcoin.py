@@ -31,13 +31,14 @@ from . import version
 from . import segwit_addr
 from . import constants
 from . import ecc
-from .crypto import Hash, sha256, hash_160
+from .crypto import Hash, sha256, hash_160, hmac_oneshot
 
 
 ################################## transactions
 
 COINBASE_MATURITY = 100
 COIN = 100000000
+TOTAL_COIN_SUPPLY_LIMIT_IN_BTC = 84000000
 
 # supported types of transaction outputs
 TYPE_ADDRESS = 0
@@ -49,12 +50,18 @@ def rev_hex(s):
     return bh2u(bfh(s)[::-1])
 
 
-def int_to_hex(i, length=1):
+def int_to_hex(i: int, length: int=1) -> str:
+    """Converts int to little-endian hex string.
+    `length` is the number of bytes available
+    """
     if not isinstance(i, int):
         raise TypeError('{} instead of int'.format(i))
+    range_size = pow(256, length)
+    if i < -range_size/2 or i >= range_size:
+        raise OverflowError('cannot convert int {} to hex ({} bytes)'.format(i, length))
     if i < 0:
         # two's complement
-        i = pow(256, length) + i
+        i = range_size + i
     s = hex(i)[2:].rstrip('L')
     s = "0"*(2*length - len(s)) + s
     return rev_hex(s)
@@ -142,7 +149,7 @@ def add_number_to_script(i: int) -> bytes:
 
 hash_encode = lambda x: bh2u(x[::-1])
 hash_decode = lambda x: bfh(x)[::-1]
-hmac_sha_512 = lambda x, y: hmac.new(x, y, hashlib.sha512).digest()
+hmac_sha_512 = lambda x, y: hmac_oneshot(x, y, hashlib.sha512)
 
 
 def is_new_seed(x, prefix=version.SEED_PREFIX):
@@ -391,7 +398,7 @@ def DecodeBase58Check(psz):
 # backwards compat
 # extended WIF for segwit (used in 3.0.x; but still used internally)
 # the keys in this dict should be a superset of what Imported Wallets can import
-SCRIPT_TYPES = {
+WIF_SCRIPT_TYPES = {
     'p2pkh':48,
     'p2wpkh':1,
     'p2wpkh-p2sh':2,
@@ -399,6 +406,14 @@ SCRIPT_TYPES = {
     'p2wsh':6,
     'p2wsh-p2sh':7
 }
+WIF_SCRIPT_TYPES_INV = inv_dict(WIF_SCRIPT_TYPES)
+
+
+PURPOSE48_SCRIPT_TYPES = {
+    'p2wsh-p2sh': 1,  # specifically multisig
+    'p2wsh': 2,       # specifically multisig
+}
+PURPOSE48_SCRIPT_TYPES_INV = inv_dict(PURPOSE48_SCRIPT_TYPES)
 
 
 def serialize_privkey(secret: bytes, compressed: bool, txin_type: str,
@@ -406,9 +421,9 @@ def serialize_privkey(secret: bytes, compressed: bool, txin_type: str,
     # we only export secrets inside curve range
     secret = ecc.ECPrivkey.normalize_secret_bytes(secret)
     if internal_use:
-        prefix = bytes([(SCRIPT_TYPES[txin_type] + constants.net.WIF_PREFIX) & 255])
+        prefix = bytes([(WIF_SCRIPT_TYPES[txin_type] + constants.net.WIF_PREFIX) & 255])
     else:
-        prefix = bytes([(SCRIPT_TYPES['p2pkh'] + constants.net.WIF_PREFIX) & 255])
+        prefix = bytes([(WIF_SCRIPT_TYPES['p2pkh'] + constants.net.WIF_PREFIX) & 255])
     suffix = b'\01' if compressed else b''
     vchIn = prefix + secret + suffix
     base58_wif = EncodeBase58Check(vchIn)
@@ -420,12 +435,12 @@ def serialize_privkey(secret: bytes, compressed: bool, txin_type: str,
 
 def deserialize_privkey(key: str) -> (str, bytes, bool):
     if is_minikey(key):
-        return 'p2pkh', minikey_to_private_key(key), True
+        return 'p2pkh', minikey_to_private_key(key), False
 
     txin_type = None
     if ':' in key:
         txin_type, key = key.split(sep=':', maxsplit=1)
-        if txin_type not in SCRIPT_TYPES:
+        if txin_type not in WIF_SCRIPT_TYPES:
             raise BitcoinException('unknown script type: {}'.format(txin_type))
     try:
         vch = DecodeBase58Check(key)
@@ -437,14 +452,13 @@ def deserialize_privkey(key: str) -> (str, bytes, bool):
     if txin_type is None:
         # keys exported in version 3.0.x encoded script type in first byte
         prefix_value = vch[0] - constants.net.WIF_PREFIX
-        inverse_script_types = inv_dict(SCRIPT_TYPES)
         try:
-            txin_type = inverse_script_types[prefix_value]
+            txin_type = WIF_SCRIPT_TYPES_INV[prefix_value]
         except KeyError:
             raise BitcoinException('invalid prefix ({}) for WIF key (1)'.format(vch[0]))
     else:
         # all other keys must have a fixed first byte
-        if vch[0] != (SCRIPT_TYPES['p2pkh'] + constants.net.WIF_PREFIX) & 255:
+        if vch[0] != (WIF_SCRIPT_TYPES['p2pkh'] + constants.net.WIF_PREFIX) & 255:
             raise BitcoinException('invalid prefix ({}) for WIF key (2)'.format(vch[0]))
 
     if len(vch) not in [33, 34]:
@@ -514,27 +528,49 @@ def minikey_to_private_key(text):
 BIP32_PRIME = 0x80000000
 
 
+def protect_against_invalid_ecpoint(func):
+    def func_wrapper(*args):
+        n = args[-1]
+        while True:
+            is_prime = n & BIP32_PRIME
+            try:
+                return func(*args[:-1], n=n)
+            except ecc.InvalidECPointException:
+                print_error('bip32 protect_against_invalid_ecpoint: skipping index')
+                n += 1
+                is_prime2 = n & BIP32_PRIME
+                if is_prime != is_prime2: raise OverflowError()
+    return func_wrapper
+
+
 # Child private key derivation function (from master private key)
 # k = master private key (32 bytes)
 # c = master chain code (extra entropy for key derivation) (32 bytes)
 # n = the index of the key we want to derive. (only 32 bits will be used)
-# If n is negative (i.e. the 32nd bit is set), the resulting private key's
+# If n is hardened (i.e. the 32nd bit is set), the resulting private key's
 #  corresponding public key can NOT be determined without the master private key.
-# However, if n is positive, the resulting private key's corresponding
+# However, if n is not hardened, the resulting private key's corresponding
 #  public key can be determined without the master private key.
+@protect_against_invalid_ecpoint
 def CKD_priv(k, c, n):
+    if n < 0: raise ValueError('the bip32 index needs to be non-negative')
     is_prime = n & BIP32_PRIME
     return _CKD_priv(k, c, bfh(rev_hex(int_to_hex(n,4))), is_prime)
 
 
 def _CKD_priv(k, c, s, is_prime):
-    keypair = ecc.ECPrivkey(k)
+    try:
+        keypair = ecc.ECPrivkey(k)
+    except ecc.InvalidECPointException as e:
+        raise BitcoinException('Impossible xprv (not within curve order)') from e
     cK = keypair.get_public_key_bytes(compressed=True)
     data = bytes([0]) + k + s if is_prime else cK + s
-    I = hmac.new(c, data, hashlib.sha512).digest()
-    k_n = ecc.number_to_string(
-        (ecc.string_to_number(I[0:32]) + ecc.string_to_number(k)) % ecc.CURVE_ORDER,
-        ecc.CURVE_ORDER)
+    I = hmac_oneshot(c, data, hashlib.sha512)
+    I_left = ecc.string_to_number(I[0:32])
+    k_n = (I_left + ecc.string_to_number(k)) % ecc.CURVE_ORDER
+    if I_left >= ecc.CURVE_ORDER or k_n == 0:
+        raise ecc.InvalidECPointException()
+    k_n = ecc.number_to_string(k_n, ecc.CURVE_ORDER)
     c_n = I[32:]
     return k_n, c_n
 
@@ -543,15 +579,20 @@ def _CKD_priv(k, c, s, is_prime):
 # c = master chain code
 # n = index of key we want to derive
 # This function allows us to find the nth public key, as long as n is
-#  non-negative. If n is negative, we need the master private key to find it.
+#  not hardened. If n is hardened, we need the master private key to find it.
+@protect_against_invalid_ecpoint
 def CKD_pub(cK, c, n):
+    if n < 0: raise ValueError('the bip32 index needs to be non-negative')
     if n & BIP32_PRIME: raise Exception()
     return _CKD_pub(cK, c, bfh(rev_hex(int_to_hex(n,4))))
 
-# helper function, callable with arbitrary string
+# helper function, callable with arbitrary string.
+# note: 's' does not need to fit into 32 bits here! (c.f. trustedcoin billing)
 def _CKD_pub(cK, c, s):
-    I = hmac.new(c, cK + s, hashlib.sha512).digest()
+    I = hmac_oneshot(c, cK + s, hashlib.sha512)
     pubkey = ecc.ECPrivkey(I[0:32]) + ecc.ECPubkey(cK)
+    if pubkey.is_at_infinity():
+        raise ecc.InvalidECPointException()
     cK_n = pubkey.get_public_key_bytes(compressed=True)
     c_n = I[32:]
     return cK_n, c_n
@@ -642,7 +683,7 @@ def xpub_from_xprv(xprv):
 
 
 def bip32_root(seed, xtype):
-    I = hmac.new(b"Bitcoin seed", seed, hashlib.sha512).digest()
+    I = hmac_oneshot(b"Bitcoin seed", seed, hashlib.sha512)
     master_k = I[0:32]
     master_c = I[32:]
     # create xprv first, as that will check if master_k is within curve order

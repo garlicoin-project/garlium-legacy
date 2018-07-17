@@ -1,4 +1,5 @@
 ELECTRUM_VERSION = '2.0.0.1' # version of the client package
+APK_VERSION = '2.0.0.0'      # read by buildozer.spec
 PROTOCOL_VERSION = '1.2'     # protocol version requested
 
 # The hash of the mnemonic seed must begin with this

@@ -9,3 +9,4 @@ jsonrpclib-pelix
 PySocks>=1.6.6
 allium-hash==1.0.2
 scrypt>=0.6.0
+qdarkstyle<3.0

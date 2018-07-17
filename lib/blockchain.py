@@ -26,9 +26,9 @@ import threading
 import allium_hash
 
 from . import util
-from . import bitcoin
+from .bitcoin import Hash, hash_encode, int_to_hex, rev_hex
 from . import constants
-from .bitcoin import *
+from .util import bfh, bh2u
 
 def get_n_factor(timestamp):
     return 10
@@ -37,6 +37,11 @@ def get_n_factor(timestamp):
 getScryptPow = lambda x, t: scrypt.hash(x, x, N=(2 << get_n_factor(t)), r=1, p=1, buflen=32)
 
 MAX_TARGET = 0x00000FFFFF000000000000000000000000000000000000000000000000000000
+
+
+class MissingHeader(Exception):
+    pass
+
 
 def serialize_header(res):
     s = int_to_hex(res.get('version'), 4) \

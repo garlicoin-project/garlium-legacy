@@ -72,7 +72,7 @@ class TxDialog(QDialog, MessageBoxMixin):
         # Take a copy; it might get updated in the main window by
         # e.g. the FX plugin.  If this happens during or after a long
         # sign operation the signatures are lost.
-        self.tx = copy.deepcopy(tx)
+        self.tx = tx = copy.deepcopy(tx)
         try:
             self.tx.deserialize()
         except BaseException as e:
@@ -83,7 +83,12 @@ class TxDialog(QDialog, MessageBoxMixin):
         self.saved = False
         self.desc = desc
 
-        self.setMinimumWidth(750)
+        # if the wallet can populate the inputs with more info, do it now.
+        # as a result, e.g. we might learn an imported address tx is segwit,
+        # in which case it's ok to display txid
+        self.wallet.add_input_info_to_all_inputs(tx)
+
+        self.setMinimumWidth(950)
         self.setWindowTitle(_("Transaction"))
 
         vbox = QVBoxLayout()
@@ -238,7 +243,7 @@ class TxDialog(QDialog, MessageBoxMixin):
             self.date_label.show()
         elif exp_n:
             text = '%.2f MB'%(exp_n/1000000)
-            self.date_label.setText(_('Position in mempool') + ': ' + text + ' ' + _('from tip'))
+            self.date_label.setText(_('Position in mempool: {} from tip').format(text))
             self.date_label.show()
         else:
             self.date_label.hide()
@@ -273,10 +278,15 @@ class TxDialog(QDialog, MessageBoxMixin):
         chg = QTextCharFormat()
         chg.setBackground(QBrush(ColorScheme.YELLOW.as_color(background=True)))
         chg.setToolTip(_("Wallet change address"))
+        twofactor = QTextCharFormat()
+        twofactor.setBackground(QBrush(ColorScheme.BLUE.as_color(background=True)))
+        twofactor.setToolTip(_("TrustedCoin (2FA) fee for the next batch of transactions"))
 
         def text_format(addr):
             if self.wallet.is_mine(addr):
                 return chg if self.wallet.is_change(addr) else rec
+            elif self.wallet.is_billing_address(addr):
+                return twofactor
             return ext
 
         def format_amount(amt):
@@ -293,15 +303,10 @@ class TxDialog(QDialog, MessageBoxMixin):
             else:
                 prevout_hash = x.get('prevout_hash')
                 prevout_n = x.get('prevout_n')
-                cursor.insertText(prevout_hash[0:8] + '...', ext)
-                cursor.insertText(prevout_hash[-8:] + ":%-4d " % prevout_n, ext)
-                addr = x.get('address')
-                if addr == "(pubkey)":
-                    _addr = self.wallet.get_txin_address(x)
-                    if _addr:
-                        addr = _addr
+                cursor.insertText(prevout_hash + ":%-4d " % prevout_n, ext)
+                addr = self.wallet.get_txin_address(x)
                 if addr is None:
-                    addr = _('unknown')
+                    addr = ''
                 cursor.insertText(addr, text_format(addr))
                 if x.get('value'):
                     cursor.insertText(format_amount(x['value']), ext)

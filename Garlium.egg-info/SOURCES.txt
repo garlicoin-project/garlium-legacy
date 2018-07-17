@@ -38,6 +38,7 @@ gui/kivy/uix/dialogs/amount_dialog.py
 gui/kivy/uix/dialogs/bump_fee_dialog.py
 gui/kivy/uix/dialogs/checkbox_dialog.py
 gui/kivy/uix/dialogs/choice_dialog.py
+gui/kivy/uix/dialogs/crash_reporter.py
 gui/kivy/uix/dialogs/fee_dialog.py
 gui/kivy/uix/dialogs/fx_dialog.py
 gui/kivy/uix/dialogs/installwizard.py
@@ -84,6 +85,7 @@ icons/clock3.png
 icons/clock4.png
 icons/clock5.png
 icons/confirmed.png
+icons/confirmed.svg
 icons/copy.png
 icons/digitalbitbox.png
 icons/digitalbitbox_unpaired.png
@@ -108,6 +110,7 @@ icons/microphone.png
 icons/network.png
 icons/offline_tx.png
 icons/preferences.png
+icons/preferences.svg
 icons/qrcode.png
 icons/qrcode_white.png
 icons/revealer.png
@@ -116,10 +119,13 @@ icons/seal.png
 icons/seed.png
 icons/speaker.png
 icons/status_connected.png
+icons/status_connected.svg
 icons/status_connected_proxy.png
+icons/status_connected_proxy.svg
 icons/status_disconnected.png
 icons/status_disconnected.svg
 icons/status_lagging.png
+icons/status_lagging.svg
 icons/status_waiting.png
 icons/status_waiting.svg
 icons/tab_addresses.png
@@ -135,13 +141,13 @@ icons/trezor_unpaired.png
 icons/trustedcoin-status.png
 icons/trustedcoin-wizard.png
 icons/unconfirmed.png
-icons/unconfirmed.svg
 icons/unlock.png
 icons/unlock.svg
 icons/unpaid.png
 icons/warning.png
 icons/zoom.png
 lib/__init__.py
+lib/base_crash_reporter.py
 lib/base_wizard.py
 lib/bitcoin.py
 lib/blockchain.py
@@ -231,6 +237,7 @@ plugins/keepkey/plugin.py
 plugins/keepkey/qt.py
 plugins/keepkey/qt_generic.py
 plugins/labels/__init__.py
+plugins/labels/cmdline.py
 plugins/labels/kivy.py
 plugins/labels/labels.py
 plugins/labels/qt.py
@@ -239,6 +246,10 @@ plugins/ledger/auth2fa.py
 plugins/ledger/cmdline.py
 plugins/ledger/ledger.py
 plugins/ledger/qt.py
+plugins/revealer/DejaVuSansMono-Bold.ttf
+plugins/revealer/LICENSE_DEJAVU.txt
+plugins/revealer/SIL Open Font License.txt
+plugins/revealer/SourceSansPro-Bold.otf
 plugins/revealer/__init__.py
 plugins/revealer/qt.py
 plugins/trezor/__init__.py

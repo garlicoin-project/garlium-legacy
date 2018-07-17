@@ -42,7 +42,8 @@ if platform.system() in ['Linux', 'FreeBSD', 'DragonFly']:
 
 extras_require = {
     'hardware': requirements_hw,
-    'fast': ['pycryptodomex'],
+    'fast': ['pycryptodomex', 'scrypt>=0.6.0'],
+    ':python_version < "3.5"': ['typing>=3.0.0'],
 }
 extras_require['full'] = extras_require['hardware'] + extras_require['fast']
 
@@ -64,6 +65,7 @@ setup(
         'electrum_ltc_plugins.keepkey',
         'electrum_ltc_plugins.labels',
         'electrum_ltc_plugins.ledger',
+        'electrum_ltc_plugins.revealer',
         'electrum_ltc_plugins.trezor',
         'electrum_ltc_plugins.digitalbitbox',
         'electrum_ltc_plugins.virtualkeyboard',
@@ -74,14 +76,8 @@ setup(
         'electrum_ltc_plugins': 'plugins',
     },
     package_data={
+        '': ['*.txt', '*.json', '*.ttf', '*.otf'],
         'electrum_ltc': [
-            'servers.json',
-            'servers_testnet.json',
-            'servers_regtest.json',
-            'currencies.json',
-            'checkpoints.json',
-            'checkpoints_testnet.json',
-            'www/index.html',
             'wordlist/*.txt',
             'locale/*/LC_MESSAGES/garlium.mo',
         ]

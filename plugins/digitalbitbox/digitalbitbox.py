@@ -559,7 +559,7 @@ class DigitalBitbox_KeyStore(Hardware_KeyStore):
                             # expected serialization though, so we leave it here until we activate it.
                             return '00' + push_script(Transaction.get_preimage_script(txin))
                         raise Exception("unsupported type %s" % txin['type'])
-                tx_dbb_serialized = CustomTXSerialization(tx.serialize()).serialize()
+                tx_dbb_serialized = CustomTXSerialization(tx.serialize()).serialize_to_network()
             else:
                 # We only need this for the signing echo / verification.
                 tx_dbb_serialized = None
@@ -647,8 +647,7 @@ class DigitalBitbox_KeyStore(Hardware_KeyStore):
                     sig_s = int(signed['sig'][64:], 16)
                     sig = ecc.der_sig_from_r_and_s(sig_r, sig_s)
                     sig = to_hexstr(sig) + '01'
-                    Transaction.add_signature_to_txin(txin, ii, sig)
-                    tx._inputs[i] = txin
+                    tx.add_signature_to_txin(i, ii, sig)
         except UserCancelled:
             raise
         except BaseException as e:

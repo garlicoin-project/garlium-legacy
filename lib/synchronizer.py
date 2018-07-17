@@ -94,7 +94,10 @@ class Synchronizer(ThreadJob):
         addr = params[0]
         history = self.wallet.history.get(addr, [])
         if self.get_status(history) != result:
-            if self.requested_histories.get(addr) is None:
+            # note that at this point 'result' can be None;
+            # if we had a history for addr but now the server is telling us
+            # there is no history
+            if addr not in self.requested_histories:
                 self.requested_histories[addr] = result
                 self.network.request_address_history(addr, self.on_address_history)
         # remove addr from list only after it is added to requested_histories
@@ -108,8 +111,11 @@ class Synchronizer(ThreadJob):
         if not params:
             return
         addr = params[0]
-        server_status = self.requested_histories.get(addr)
-        if server_status is None:
+        try:
+            server_status = self.requested_histories[addr]
+        except KeyError:
+            # note: server_status can be None even if we asked for the history,
+            # so it is not sufficient to test that
             self.print_error("receiving history (unsolicited)", addr, len(result))
             return
         self.print_error("receiving history", addr, len(result))
@@ -118,9 +124,6 @@ class Synchronizer(ThreadJob):
         # tx_fees
         tx_fees = [(item['tx_hash'], item.get('fee')) for item in result]
         tx_fees = dict(filter(lambda x:x[1] is not None, tx_fees))
-        # Note if the server hasn't been patched to sort the items properly
-        if hist != sorted(hist, key=lambda x:x[1]):
-            self.network.interface.print_error("serving improperly sorted address histories")
         # Check that txids are unique
         if len(hashes) != len(result):
             self.print_error("error: server history has non-unique txids: %s"% addr)
@@ -142,12 +145,15 @@ class Synchronizer(ThreadJob):
         if not params:
             return
         tx_hash = params[0]
-        #assert tx_hash == hash_encode(Hash(bytes.fromhex(result)))
         tx = Transaction(result)
         try:
             tx.deserialize()
         except Exception:
             self.print_msg("cannot deserialize transaction, skipping", tx_hash)
+            return
+        if tx_hash != tx.txid():
+            self.print_error("received tx does not match expected txid ({} != {})"
+                             .format(tx_hash, tx.txid()))
             return
         tx_height = self.requested_tx.pop(tx_hash)
         self.wallet.receive_tx_callback(tx_hash, tx, tx_height)
@@ -160,15 +166,16 @@ class Synchronizer(ThreadJob):
 
     def request_missing_txs(self, hist):
         # "hist" is a list of [tx_hash, tx_height] lists
-        requests = []
+        transaction_hashes = []
         for tx_hash, tx_height in hist:
             if tx_hash in self.requested_tx:
                 continue
             if tx_hash in self.wallet.transactions:
                 continue
-            requests.append(('blockchain.transaction.get', [tx_hash]))
+            transaction_hashes.append(tx_hash)
             self.requested_tx[tx_hash] = tx_height
-        self.network.send(requests, self.on_tx_response)
+
+        self.network.get_transactions(transaction_hashes, self.on_tx_response)
 
     def initialize(self):
         '''Check the initial state of the wallet.  Subscribe to all its

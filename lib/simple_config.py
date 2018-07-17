@@ -4,6 +4,7 @@ import time
 import os
 import stat
 from decimal import Decimal
+from typing import Union
 
 from copy import deepcopy
 
@@ -36,7 +37,7 @@ def set_config(c):
     config = c
 
 
-FINAL_CONFIG_VERSION = 2
+FINAL_CONFIG_VERSION = 3
 
 
 class SimpleConfig(PrintError):
@@ -112,6 +113,9 @@ class SimpleConfig(PrintError):
         elif self.get('regtest'):
             path = os.path.join(path, 'regtest')
             make_dir(path, allow_symlink=False)
+        elif self.get('simnet'):
+            path = os.path.join(path, 'simnet')
+            make_dir(path, allow_symlink=False)
 
         self.print_error("garlium directory", path)
         return path
@@ -160,6 +164,7 @@ class SimpleConfig(PrintError):
             self.print_error('upgrading config')
 
             self.convert_version_2()
+            self.convert_version_3()
 
             self.set_key('config_version', FINAL_CONFIG_VERSION, save=True)
 
@@ -181,6 +186,19 @@ class SimpleConfig(PrintError):
             self._set_key_in_user_config('server', None)
 
         self.set_key('config_version', 2)
+
+    def convert_version_3(self):
+        if not self._is_upgrade_method_needed(2, 2):
+            return
+
+        base_unit = self.user_config.get('base_unit')
+        if isinstance(base_unit, str):
+            self._set_key_in_user_config('base_unit', None)
+            map_ = {'ltc':8, 'mltc':5, 'ultc':2, 'bits':2, 'sat':0}
+            decimal_point = map_.get(base_unit.lower())
+            self._set_key_in_user_config('decimal_point', decimal_point)
+
+        self.set_key('config_version', 3)
 
     def _is_upgrade_method_needed(self, min_version, max_version):
         cur_version = self.get_config_version()
@@ -278,16 +296,18 @@ class SimpleConfig(PrintError):
         return get_fee_within_limits
 
     @impose_hard_limits_on_fee
-    def eta_to_fee(self, i):
+    def eta_to_fee(self, slider_pos) -> Union[int, None]:
         """Returns fee in sat/kbyte."""
-        if i < 4:
-            j = FEE_ETA_TARGETS[i]
-            fee = self.fee_estimates.get(j)
+        slider_pos = max(slider_pos, 0)
+        slider_pos = min(slider_pos, len(FEE_ETA_TARGETS))
+        if slider_pos < len(FEE_ETA_TARGETS):
+            target_blocks = FEE_ETA_TARGETS[slider_pos]
+            fee = self.fee_estimates.get(target_blocks)
         else:
-            assert i == 4
             fee = self.fee_estimates.get(2)
             if fee is not None:
                 fee += fee/2
+                fee = int(fee)
         return fee
 
     def fee_to_depth(self, target_fee):
@@ -301,9 +321,9 @@ class SimpleConfig(PrintError):
         return depth
 
     @impose_hard_limits_on_fee
-    def depth_to_fee(self, i):
+    def depth_to_fee(self, slider_pos) -> int:
         """Returns fee in sat/kbyte."""
-        target = self.depth_target(i)
+        target = self.depth_target(slider_pos)
         depth = 0
         for fee, s in self.mempool_fees:
             depth += s
@@ -313,8 +333,10 @@ class SimpleConfig(PrintError):
             return 0
         return fee * 1000
 
-    def depth_target(self, i):
-        return FEE_DEPTH_TARGETS[i]
+    def depth_target(self, slider_pos):
+        slider_pos = max(slider_pos, 0)
+        slider_pos = min(slider_pos, len(FEE_DEPTH_TARGETS)-1)
+        return FEE_DEPTH_TARGETS[slider_pos]
 
     def eta_target(self, i):
         if i == len(FEE_ETA_TARGETS):
@@ -433,14 +455,35 @@ class SimpleConfig(PrintError):
     def use_mempool_fees(self):
         return bool(self.get('mempool_fees', False))
 
-    def fee_per_kb(self, dyn=None, mempool=None):
+    def _feerate_from_fractional_slider_position(self, fee_level: float, dyn: bool,
+                                                 mempool: bool) -> Union[int, None]:
+        fee_level = max(fee_level, 0)
+        fee_level = min(fee_level, 1)
+        if dyn:
+            max_pos = (len(FEE_DEPTH_TARGETS) - 1) if mempool else len(FEE_ETA_TARGETS)
+            slider_pos = round(fee_level * max_pos)
+            fee_rate = self.depth_to_fee(slider_pos) if mempool else self.eta_to_fee(slider_pos)
+        else:
+            max_pos = len(FEERATE_STATIC_VALUES) - 1
+            slider_pos = round(fee_level * max_pos)
+            fee_rate = FEERATE_STATIC_VALUES[slider_pos]
+        return fee_rate
+
+    def fee_per_kb(self, dyn: bool=None, mempool: bool=None, fee_level: float=None) -> Union[int, None]:
         """Returns sat/kvB fee to pay for a txn.
         Note: might return None.
+
+        fee_level: float between 0.0 and 1.0, representing fee slider position
         """
         if dyn is None:
             dyn = self.is_dynfee()
         if mempool is None:
             mempool = self.use_mempool_fees()
+        if fee_level is not None:
+            return self._feerate_from_fractional_slider_position(fee_level, dyn, mempool)
+        # there is no fee_level specified; will use config.
+        # note: 'depth_level' and 'fee_level' in config are integer slider positions,
+        # unlike fee_level here, which (when given) is a float in [0.0, 1.0]
         if dyn:
             if mempool:
                 fee_rate = self.depth_to_fee(self.get_depth_level())

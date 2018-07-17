@@ -9,23 +9,27 @@ jsonrpclib-pelix
 PySocks>=1.6.6
 allium-hash==1.0.2
 scrypt>=0.6.0
+qdarkstyle<3.0
+
+[:python_version < "3.5"]
+typing>=3.0.0
 
 [fast]
 pycryptodomex
+scrypt>=0.6.0
 
 [full]
 Cython>=0.27
-rlp==0.6.0
 trezor[hidapi]>=0.9.0
 keepkey
 btchip-python
 websocket-client
 hidapi
 pycryptodomex
+scrypt>=0.6.0
 
 [hardware]
 Cython>=0.27
-rlp==0.6.0
 trezor[hidapi]>=0.9.0
 keepkey
 btchip-python
