@@ -1,6 +1,6 @@
 [submodule "contrib/deterministic-build/electrum-grlc-icons"]
 	path = contrib/deterministic-build/electrum-grlc-icons
-	url = git@github.com:garlicoin-project/electrum-grlc-icons.git
+	url = https://github.com/garlicoin-project/electrum-grlc-icons
 [submodule "contrib/deterministic-build/electrum-grlc-locale"]
 	path = contrib/deterministic-build/electrum-grlc-locale
-	url = git@github.com:garlicoin-project/electrum-grlc-locale.git
+	url = https://github.com/garlicoin-project/electrum-grlc-locale
