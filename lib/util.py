@@ -563,8 +563,6 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'Bakery': ('https://explorer.grlc-bakery.fun/',
-                        {'tx': 'tx/', 'addr': 'address'}),
     'Insight': ('https://garlicinsight.com/',
                         {'tx': 'tx/', 'addr': 'address'}),
     'system default': ('blockchain:',
