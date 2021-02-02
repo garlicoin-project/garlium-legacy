@@ -563,7 +563,7 @@ def time_difference(distance_in_time, include_seconds):
         return "over %d years" % (round(distance_in_minutes / 525600))
 
 mainnet_block_explorers = {
-    'Insight': ('https://garlicinsight.com/',
+    'Insight': ('https://insight.garli.co.in/',
                         {'tx': 'tx/', 'addr': 'address'}),
     'system default': ('blockchain:',
                         {'tx': 'tx', 'addr': 'address'}),
