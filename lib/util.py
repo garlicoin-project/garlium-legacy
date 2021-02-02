@@ -570,8 +570,6 @@ mainnet_block_explorers = {
 }
 
 testnet_block_explorers = {
-    'Bakery': ('https://explorer.grlc-bakery.fun/',
-                        {'tx': 'tx', 'addr': 'address'}),
     'system default': ('blockchain:',
                        {'tx': 'tx', 'addr': 'address'}),
 }
