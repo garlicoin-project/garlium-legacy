@@ -1,17 +1,23 @@
 {
-    "garlium.garlicpool.org": {
+    "de.node.garlico.in": {
         "pruning": "-",
         "s": "50002",
         "t": "50001",
         "version": "1.1"
     },
-    "roflmining.com": {
+    "us.node.garlico.in": {
         "pruning": "-",
         "s": "50002",
         "t": "50001",
         "version": "1.1"
     },
-    "tuxprint.com": {
+    "ca.node.garlico.in": {
+        "pruning": "-",
+        "s": "50002",
+        "t": "50001",
+        "version": "1.1"
+    },
+    "sg.node.garlico.in": {
         "pruning": "-",
         "s": "50002",
         "t": "50001",
@@ -27,6 +33,31 @@
         "pruning": "-",
         "s": "50002",
         "t": "50001",
+        "version": "1.1"
+    },
+    "fr.garlium.crapules.org": {
+        "pruning": "-",
+        "s": "50002",
+        "version": "1.1"
+    },
+    "uk.garlium.crapules.org": {
+        "pruning": "-",
+        "s": "50002",
+        "version": "1.1"
+    },
+    "pl.garlium.crapules.org": {
+        "pruning": "-",
+        "s": "50002",
+        "version": "1.1"
+    },
+    "ca.garlium.crapules.org": {
+        "pruning": "-",
+        "s": "50002",
+        "version": "1.1"
+    },
+    "au.garlium.crapules.org": {
+        "pruning": "-",
+        "s": "50002",
         "version": "1.1"
     }
 }
